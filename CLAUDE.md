@@ -83,6 +83,13 @@ source mark (currently Contra) degrades to a quiet wordmark badge rather than a 
 extend the registry with a real `{ kind: "mark", Icon }` entry the moment one is verified,
 don't hand-draw a brand logo from memory.
 
+**Never call `navigator.clipboard.writeText` directly.** Use `copyToClipboard()` from
+`src/lib/utils.ts` for any copy-to-clipboard button. The raw Clipboard API can hang
+indefinitely with no rejection (observed under automated/CDP-driven clicks, and plausible in
+other constrained contexts) — `copyToClipboard` races it against a timeout and falls back to
+`execCommand`, so it always resolves and the UI can show a real success/error state instead of
+silently doing nothing.
+
 **UI primitives are Base UI, not Radix.** `components.json` uses shadcn's `base-nova` style on
 `@base-ui/react` — components like `button.tsx`/`badge.tsx` use Base UI's `useRender`/
 `mergeProps`/`data-slot` patterns, not the Radix `Slot`/`asChild` API most shadcn examples
