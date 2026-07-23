@@ -17,7 +17,7 @@ export function CreatedBanner({ slug }: { slug: string }) {
   }
 
   return (
-    <Card className="mb-6 border-primary/30 bg-primary/5">
+    <Card className="mb-6 animate-in border-primary/30 bg-primary/5 fade-in-0 slide-in-from-top-2 duration-300">
       <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-medium text-foreground">Request created — send this link</p>

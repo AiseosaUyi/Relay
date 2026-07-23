@@ -9,6 +9,7 @@ import { CreatedBanner } from "./created-banner";
 import { RequestCard } from "./request-card";
 import { cn } from "@/lib/utils";
 import { RelayFlowIllustration } from "@/components/illustrations/relay-flow";
+import { Logo } from "@/components/logo";
 
 export default async function DashboardPage(props: PageProps<"/dashboard/[slug]">) {
   const { slug } = await props.params;
@@ -33,9 +34,7 @@ export default async function DashboardPage(props: PageProps<"/dashboard/[slug]"
     <main className="min-h-svh w-full">
       <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex w-full max-w-2xl items-center justify-between px-6 py-4">
-          <Link href="/" className="font-heading text-sm font-semibold tracking-tight">
-            Relay
-          </Link>
+          <Logo href="/" />
           <Link href="/new" className={buttonVariants()}>
             <Plus /> New request
           </Link>
@@ -78,10 +77,14 @@ export default async function DashboardPage(props: PageProps<"/dashboard/[slug]"
           </Card>
         ) : (
           <ul className="mt-6 space-y-3">
-            {requests.map((request) => {
+            {requests.map((request, i) => {
               const platforms = JSON.parse(request.platforms) as Platform[];
               return (
-                <li key={request.id}>
+                <li
+                  key={request.id}
+                  className="animate-in fade-in-0 slide-in-from-bottom-1 duration-300 fill-mode-backwards"
+                  style={{ animationDelay: `${Math.min(i, 5) * 40}ms` }}
+                >
                   <RequestCard
                     clientName={request.client_name}
                     createdAt={request.created_at}

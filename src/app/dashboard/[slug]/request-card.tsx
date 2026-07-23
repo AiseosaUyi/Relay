@@ -30,7 +30,7 @@ export function RequestCard({
   }
 
   return (
-    <Card className="transition-shadow hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_32px_-12px_rgba(0,0,0,0.16)] dark:hover:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_16px_32px_-12px_rgba(0,0,0,0.7)]">
+    <Card className="transition-shadow hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_32px_-12px_rgba(0,0,0,0.16)]">
       <CardHeader className="flex-row items-center gap-3 space-y-0">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-wash text-sm font-semibold text-foreground">
           {clientName.charAt(0).toUpperCase()}

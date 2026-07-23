@@ -1,383 +1,101 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 @AGENTS.md
 
-# SIPPY - Master AI Development Guide
-
-You are the Lead Product Designer, Senior Frontend Engineer, Backend Engineer, UX Researcher, Motion Designer, System Architect and Product Manager for SIPPY.
-
-Your responsibility is to design and build SIPPY to world-class quality.
-
-This project should feel comparable to Apple, Stripe, Linear, Airbnb, Vercel and Shopify—not by copying their designs, but by matching their clarity, consistency, polish, performance, accessibility, and attention to detail.
-
----
-
-# What is SIPPY?
-
-SIPPY is not an ecommerce website.
-
-SIPPY is Nigeria's premium beverage marketplace.
-
-Customers can discover, compare and order drinks from multiple vendors through a single seamless experience.
-
-SIPPY owns the customer experience.
-
-Vendors own inventory.
-
-Customers should never feel like they are shopping different stores.
-
-It should feel like one intelligent marketplace.
-
----
-
-# Product Philosophy
-
-Every decision must optimize for simplicity.
-
-Never add features because they are common. Every feature must solve a real customer problem.
-
-Every screen should answer one primary question.
-
-Reduce cognitive load.
-
-Remove unnecessary choices.
-
-Design for speed.
-
-Design for trust.
-
-Design for premium quality.
-
----
-
-# Marketplace Rules
-
-Products come first.
-
-Vendors come second.
-
-Customers search products—not vendors.
-
-Products use one canonical catalogue.
-
-Vendors simply attach:
-
-- price
-- stock
-- delivery
-- availability
-
-The cart should intelligently choose the best vendor combination.
-
-Never optimise for cheapest individual item.
-
-Optimise for the cheapest complete basket after delivery.
-
-Minimise vendor splitting.
-
----
-
-# Design Principles
-
-The interface should feel:
-
-Elegant
-
-Premium
-
-Minimal
-
-Editorial
-
-Fast
-
-Confident
-
-Modern
-
-Never clutter interfaces.
-
-Use whitespace generously.
-
-Typography should do most of the visual work.
-
-Avoid heavy borders.
-
-Avoid unnecessary shadows.
-
-Avoid decorative elements.
-
-Every element must have purpose.
-
----
-
-# Motion Principles
-
-Animations should communicate.
-
-Not decorate.
-
-Use motion to:
-
-Guide attention
-
-Explain hierarchy
-
-Show continuity
-
-Provide feedback
-
-Default transitions:
-
-150–300ms
-
-Use spring animations naturally.
-
-Never animate everything.
-
-Respect reduced-motion preferences.
-
----
-
-# UX Rules
-
-Search should always be easy to find.
-
-Navigation should be obvious.
-
-Primary actions should be visually dominant.
-
-Secondary actions should never compete.
-
-Forms should require minimum effort.
-
-Always prevent errors before displaying them.
-
-Use progressive disclosure.
-
-Never overwhelm users.
-
-Loading should feel instant.
-
-Always provide skeleton loading.
-
-Empty states should educate users.
-
-Error states should explain the problem and next step.
-
----
-
-# Accessibility
-
-Keyboard accessible.
-
-Screen-reader friendly.
-
-WCAG AA minimum.
-
-High contrast.
-
-Visible focus states.
-
-Touch targets minimum 44px.
-
-Never rely on colour alone.
-
----
-
-# Performance
-
-Optimise images.
-
-Lazy load where appropriate.
-
-Code split routes.
-
-Minimise JavaScript.
-
-Use Server Components where appropriate.
-
-Avoid unnecessary client rendering.
-
-Target Lighthouse 95+.
-
----
-
-# Frontend Stack
-
-Next.js (App Router)
-
-TypeScript
-
-Tailwind CSS
-
-shadcn/ui
-
-Framer Motion
-
-React Hook Form
-
-Zod
-
-TanStack Query where useful
-
-Lucide Icons
-
----
-
-# Backend
-
-Supabase
-
-PostgreSQL
-
-Row Level Security
-
-Storage
-
-Realtime
-
-Edge Functions when required
-
----
-
-# Code Standards
-
-Write readable code.
-
-Prefer composition over inheritance.
-
-Keep components small.
-
-Avoid duplication.
-
-Extract reusable components.
-
-Use meaningful names.
-
-Document complex logic.
-
-Avoid unnecessary abstractions.
-
----
-
-# Component Rules
-
-Before creating a component ask:
-
-Can an existing component be reused?
-
-If yes:
-
-Reuse it.
-
-If not:
-
-Create a reusable component.
-
-Never duplicate UI.
-
----
-
-# Design System
-
-Maintain consistent:
-
-Spacing
-
-Typography
-
-Colours
-
-Border radius
-
-Buttons
-
-Inputs
-
-Cards
-
-Lists
-
-Tables
-
-Modals
-
-Drawers
-
-Badges
-
-Navigation
-
-Icons
-
-Everything must feel like one system.
-
----
-
-# Feature Development Process
-
-Before writing code:
-
-Understand the problem.
-
-Identify the user.
-
-Think through edge cases.
-
-Design the experience.
-
-Then write code.
-
-After coding:
-
-Review UX.
-
-Review accessibility.
-
-Review responsiveness.
-
-Review performance.
-
-Refactor if needed.
-
----
-
-# Decision Framework
-
-When multiple solutions exist:
-
-Choose the simplest.
-
-Choose the most scalable.
-
-Choose the easiest to maintain.
-
-Choose the most elegant.
-
-Never optimise for speed of development at the expense of quality.
-
----
-
-# Expected Output
-
-When implementing features:
-
-Explain the approach briefly.
-
-Build production-quality code.
-
-Use reusable components.
-
-Maintain consistency.
-
-Do not invent fake APIs.
-
-Do not invent fake data models.
-
-If requirements are unclear, ask concise clarifying questions before implementing.
-
-Always think like the Lead Product Designer and Lead Engineer—not just a code generator.
-
-The objective is to build the best beverage marketplace in Africa with exceptional UX, engineering quality, maintainability, and scalability.
+## What this is
+
+Recommendation Relay ("Relay"): a client writes one recommendation for a freelancer, and the
+app adapts it (length + tone) for LinkedIn, Upwork, and Contra — the only three
+freelance/design platforms with a client-recommendation feature. No platform lets a third
+party post on someone's behalf, so this is a drafting + tracking assistant, not an
+auto-poster: the client still submits it themselves on each platform; this tool just gives
+them a pre-written, correctly-sized version to paste in when that platform's native request
+arrives.
+
+## Commands
+
+```bash
+npm run dev      # start dev server (localhost:3000, falls back to next free port)
+npm run build    # production build
+npm run lint     # eslint (flat config: eslint-config-next core-web-vitals + typescript)
+npx tsc --noEmit # typecheck (no separate script defined)
+```
+
+No test suite is configured in this repo.
+
+To enable real AI-adapted variants (tone-aware, not just length-trimmed), set
+`AI_GATEWAY_API_KEY` before starting the dev server (get a key from the Vercel AI Gateway).
+Without it, the app runs fully on a deterministic fallback adapter — this is the default state
+for a fresh clone, and it's a normal, demoable mode, not a broken one.
+
+Local data persists in a git-ignored SQLite file at `data/relay.db`. Delete `data/` to reset
+to a clean state.
+
+## Architecture
+
+**Core data flow:** `freelancer` (1) → `requests` (many, one per client) → `variants` (many,
+one row per platform per request). A request is created with a fixed set of platforms; each
+gets its own variant row (`pending` until the client submits text, then `adapted`). See
+`src/lib/db/client.ts` for the schema.
+
+**Routes and what happens in each:**
+- `/` — marketing/landing page.
+- `/new` — freelancer onboarding (first visit, captures a name) or adds a new client request to
+  an existing freelancer. On submit, sets an httpOnly cookie and redirects to the dashboard.
+- `/dashboard/[slug]` — freelancer's request list, reached via the cookie or the URL slug
+  directly (no login).
+- `/r/[slug]` — the link sent to the client. They write one recommendation; submitting it
+  triggers adaptation and shows per-platform tabs with copy-ready text and instructions for
+  when to paste it in.
+
+**Identity has no auth layer.** A freelancer is identified purely by an httpOnly cookie
+(`relay_freelancer_slug`) mapping to their `freelancer.slug`. There's no login, no email
+verification, and no account-recovery path — clearing cookies loses dashboard access
+permanently. This is a known, deliberate gap (not an oversight to silently "fix"); changing it
+is a product decision, not a UI fix.
+
+**Adaptation core loop** (`src/lib/adaptation/adapt.ts`): `adaptRecommendation()` branches on
+whether `AI_GATEWAY_API_KEY` is set. AI path uses the Vercel AI Gateway
+(`anthropic/claude-haiku-4.5` via the `ai` SDK) with a per-platform Zod schema built from
+`src/lib/adaptation/platforms.ts`. The fallback path is a deterministic sentence-boundary
+truncation to each platform's char limit — no tone rewriting. Both paths return the identical
+`AdaptedVariant[]` shape, and every variant carries `generatedBy: "ai" | "fallback"` so the UI
+can honestly label which mode produced it (never claim AI when it wasn't used).
+
+**`src/lib/adaptation/platforms.ts` is the single source of truth** for platform metadata
+(label, char limit, tone description, per-platform instruction copy) — it drives both the AI
+prompt construction and every platform-facing UI element. Contra's char limit is an
+unverified/best-guess value (flagged in-file); don't treat it as confirmed.
+
+**Data layer boundary:** every DB call goes through `src/lib/db/repository.ts`.
+`src/lib/db/client.ts` is the only file that owns the actual connection (SQLite via
+`better-sqlite3`, dev-only) — it's the documented swap point for Supabase in production. Don't
+call `better-sqlite3` directly from route/component code; add a repository function instead.
+
+**Icon system** (`src/components/icons/platform-icon.tsx`): one lookup (`PlatformIcon`) used
+everywhere a platform needs a visual mark, so brand icons aren't hand-duplicated per call site.
+Icons render in `currentColor` (state-driven via the parent's text-color class — muted at rest,
+primary/foreground when selected/active), never a hardcoded brand hex. Marks come from
+`react-icons`/`simple-icons` only where verified accurate; a platform without a confirmed
+source mark (currently Contra) degrades to a quiet wordmark badge rather than a guessed logo —
+extend the registry with a real `{ kind: "mark", Icon }` entry the moment one is verified,
+don't hand-draw a brand logo from memory.
+
+**UI primitives are Base UI, not Radix.** `components.json` uses shadcn's `base-nova` style on
+`@base-ui/react` — components like `button.tsx`/`badge.tsx` use Base UI's `useRender`/
+`mergeProps`/`data-slot` patterns, not the Radix `Slot`/`asChild` API most shadcn examples
+assume. Match that pattern when adding new UI primitives.
+
+**Tailwind v4, no config file.** There's no `tailwind.config.ts`; all tokens (colors,
+radius scale, fonts) are defined as CSS custom properties in `src/app/globals.css` under
+`:root` / `.dark` / `@theme inline`. Add new design tokens there, not in a JS config.
+
+**Theme is pinned to light.** `ThemeProvider` in `src/app/layout.tsx` uses
+`forcedTheme="light"` — dark-mode CSS variables still exist in `globals.css` (`.dark { ... }`)
+but are intentionally not served; there's no theme toggle anywhere. Don't add `dark:` variants
+to new components — light is the only supported experience right now.
 
 ## Skill routing
 

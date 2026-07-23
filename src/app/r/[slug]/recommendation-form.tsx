@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Copy, Check, Loader2, ArrowRight, Bell } from "lucide-react";
 import { PLATFORMS, type Platform } from "@/lib/adaptation/platforms";
+import { PlatformIcon } from "@/components/icons/platform-icon";
 import { submitRecommendation, recordCopy, type SubmitResult } from "./actions";
 
 type Variant = { platform: Platform; text: string; generatedBy: "ai" | "fallback" };
@@ -40,9 +41,9 @@ export function RecommendationForm({
 
   if (variants) {
     return (
-      <div className="space-y-6">
+      <div className="animate-in space-y-6 fade-in-0 duration-300">
         <div className="flex flex-col items-center text-center">
-          <span className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
+          <span className="flex size-11 animate-in items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary zoom-in-50 duration-300">
             <Check className="size-5" strokeWidth={2.5} />
           </span>
           <h1 className="mt-4 font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -57,16 +58,14 @@ export function RecommendationForm({
           <TabsList className="w-full">
             {variants.map((v) => (
               <TabsTrigger key={v.platform} value={v.platform} className="flex-1 gap-1.5">
-                <span className="flex size-5 items-center justify-center rounded-full bg-wash text-[10px] font-semibold text-foreground">
-                  {PLATFORMS[v.platform].monogram}
-                </span>
+                <PlatformIcon id={v.platform} className="size-4" />
                 {PLATFORMS[v.platform].label}
               </TabsTrigger>
             ))}
           </TabsList>
           {variants.map((v) => (
             <TabsContent key={v.platform} value={v.platform} className="mt-4 space-y-3">
-              <div className="rounded-2xl bg-card p-4 text-base whitespace-pre-wrap text-foreground ring-1 ring-foreground/10 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_8px_24px_-12px_rgba(0,0,0,0.6)]">
+              <div className="rounded-2xl bg-card p-4 text-base whitespace-pre-wrap text-foreground ring-1 ring-foreground/10 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]">
                 {v.text}
               </div>
 
@@ -115,7 +114,7 @@ export function RecommendationForm({
         </p>
       </div>
 
-      <div className="rounded-2xl bg-card p-1 ring-1 ring-foreground/10 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_8px_24px_-12px_rgba(0,0,0,0.6)]">
+      <div className="rounded-2xl bg-card p-1 ring-1 ring-foreground/10 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]">
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}

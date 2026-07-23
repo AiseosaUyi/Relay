@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PLATFORM_LIST } from "@/lib/adaptation/platforms";
 import { createRequestAction, type CreateRequestState } from "./actions";
-import { User, AtSign, Mail, Link2, ArrowRight } from "lucide-react";
+import { User, AtSign, Mail, ArrowRight } from "lucide-react";
+import { PlatformIcon } from "@/components/icons/platform-icon";
 
 const initialState: CreateRequestState = { error: null };
 
@@ -18,12 +19,9 @@ export function NewRequestForm({
   const [state, formAction, pending] = useActionState(createRequestAction, initialState);
 
   return (
-    <Card className="mx-auto w-full max-w-md">
+    <Card className="mx-auto w-full max-w-md [--card-spacing:--spacing(6)]">
       <CardHeader>
-        <span className="mb-1 flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <Link2 className="size-5" />
-        </span>
-        <CardTitle className="font-heading text-xl tracking-tight">
+        <CardTitle className="font-heading text-2xl tracking-tight">
           {freelancerName ? `New request` : "Set up your recommendation page"}
         </CardTitle>
         <CardDescription>
@@ -33,7 +31,7 @@ export function NewRequestForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form action={formAction} className="space-y-5">
           {!freelancerName && (
             <Field label="Your name" icon={User}>
               <Input name="freelancerName" placeholder="Ada Lovelace" required className="pl-9" />
@@ -67,9 +65,7 @@ export function NewRequestForm({
                     defaultChecked
                     className="sr-only"
                   />
-                  <span className="flex size-5 items-center justify-center rounded-full bg-surface text-[10px] font-semibold">
-                    {platform.monogram}
-                  </span>
+                  <PlatformIcon id={platform.id} className="size-4" />
                   {platform.label}
                 </label>
               ))}
