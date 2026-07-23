@@ -4,16 +4,14 @@
  * used for source/target nodes throughout the product. Deliberately one
  * bold gesture so it still reads clearly at favicon/nav scale, unlike a
  * multi-curve illustration.
+ *
+ * Decorative (aria-hidden): every usage sits directly beside the visible
+ * "Relay" wordmark, so giving the icon its own aria-label would double up
+ * the accessible name (screen readers announcing "Relay Relay").
  */
 export function RelayMark({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={className}
-      role="img"
-      aria-label="Relay"
-    >
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
       <line
         x1="8"
         y1="16"
