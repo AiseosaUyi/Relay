@@ -34,11 +34,23 @@ export function NewRequestForm({
         <form action={formAction} className="space-y-5">
           {!freelancerName && (
             <Field label="Your name" icon={User}>
-              <Input name="freelancerName" placeholder="Ada Lovelace" required className="pl-9" />
+              <Input
+                name="freelancerName"
+                placeholder="Ada Lovelace"
+                required
+                className="pl-9"
+                defaultValue={state.values?.freelancerName}
+              />
             </Field>
           )}
           <Field label="Client name" icon={AtSign}>
-            <Input name="clientName" placeholder="Grace Hopper" required className="pl-9" />
+            <Input
+              name="clientName"
+              placeholder="Grace Hopper"
+              required
+              className="pl-9"
+              defaultValue={state.values?.clientName}
+            />
           </Field>
           <Field label="Client email (optional)" icon={Mail}>
             <Input
@@ -46,6 +58,7 @@ export function NewRequestForm({
               type="email"
               placeholder="grace@example.com"
               className="pl-9"
+              defaultValue={state.values?.clientEmail}
             />
           </Field>
           <fieldset className="space-y-2 pt-1">
@@ -62,7 +75,7 @@ export function NewRequestForm({
                     type="checkbox"
                     name="platforms"
                     value={platform.id}
-                    defaultChecked
+                    defaultChecked={state.values ? state.values.platforms.includes(platform.id) : true}
                     className="sr-only"
                   />
                   <PlatformIcon id={platform.id} className="size-4" />

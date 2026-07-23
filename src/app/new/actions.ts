@@ -17,7 +17,18 @@ const formSchema = z.object({
     .min(1, "Pick at least one platform."),
 });
 
-export type CreateRequestState = { error: string | null };
+export type CreateRequestState = {
+  error: string | null;
+  // Echoed back on failure so the form can repopulate instead of the
+  // client re-typing everything — a failed submit re-renders this page
+  // from the server, which resets any uncontrolled input to its default.
+  values?: {
+    freelancerName: string;
+    clientName: string;
+    clientEmail: string;
+    platforms: Platform[];
+  };
+};
 
 export async function createRequestAction(
   _prevState: CreateRequestState,
@@ -26,23 +37,33 @@ export async function createRequestAction(
   const cookieStore = await cookies();
   const existingSlug = cookieStore.get(FREELANCER_COOKIE)?.value;
 
+  const freelancerNameRaw = formData.get("freelancerName")?.toString() ?? "";
+  const clientNameRaw = formData.get("clientName")?.toString() ?? "";
+  const clientEmailRaw = formData.get("clientEmail")?.toString() ?? "";
   const platforms = formData.getAll("platforms") as Platform[];
+  const values = {
+    freelancerName: freelancerNameRaw,
+    clientName: clientNameRaw,
+    clientEmail: clientEmailRaw,
+    platforms,
+  };
+
   const parsed = formSchema.safeParse({
-    freelancerName: formData.get("freelancerName")?.toString() || undefined,
-    clientName: formData.get("clientName")?.toString() ?? "",
-    clientEmail: formData.get("clientEmail")?.toString() ?? "",
+    freelancerName: freelancerNameRaw || undefined,
+    clientName: clientNameRaw,
+    clientEmail: clientEmailRaw,
     platforms,
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Please check the form." };
+    return { error: parsed.error.issues[0]?.message ?? "Please check the form.", values };
   }
 
   let freelancer = existingSlug ? getFreelancerBySlug(existingSlug) : undefined;
 
   if (!freelancer) {
     if (!parsed.data.freelancerName) {
-      return { error: "Your name is required." };
+      return { error: "Your name is required.", values };
     }
     freelancer = createFreelancer(parsed.data.freelancerName);
     cookieStore.set(FREELANCER_COOKIE, freelancer.slug, {
