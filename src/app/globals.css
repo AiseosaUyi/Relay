@@ -5,15 +5,15 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Base brand tokens — single source of truth, see /creative-director spec */
-  --color-ink: #15130f;
-  --color-paper: #faf7f2;
-  --color-muted: #6b655c;
-  --color-line: #e8e2d8;
+  /* Base brand tokens — single source of truth, see /creative-director spec (v2: monochrome + sans) */
+  --color-ink: #0a0a0a;
+  --color-paper: #ffffff;
+  --color-muted: #71717a;
+  --color-line: #e4e4e7;
   --color-surface: #ffffff;
-  --color-wash: #f1ece3;
-  --color-brand: #a8501a;
-  --color-brand-foreground: #fff8ef;
+  --color-wash: #f4f4f5;
+  --color-brand: #2563eb;
+  --color-brand-foreground: #ffffff;
 
   /* shadcn semantic slots, wired to the brand tokens above */
   --background: var(--color-paper);
@@ -34,18 +34,18 @@
   --border: var(--color-line);
   --input: var(--color-line);
   --ring: var(--color-brand);
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 }
 
 .dark {
-  --color-ink: #f5f1ea;
-  --color-paper: #141210;
-  --color-muted: #a79e90;
-  --color-line: #423a2c;
-  --color-surface: #1c1914;
-  --color-wash: #211d17;
-  --color-brand: #e08a3c;
-  --color-brand-foreground: #1a1207;
+  --color-ink: #fafafa;
+  --color-paper: #000000;
+  --color-muted: #a1a1aa;
+  --color-line: #27272a;
+  --color-surface: #000000;
+  --color-wash: #18181b;
+  --color-brand: #3b82f6;
+  --color-brand-foreground: #ffffff;
   --destructive: #e5484d;
 }
 
@@ -79,8 +79,8 @@
 
   --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  --font-display: var(--font-fraunces);
-  --font-heading: var(--font-fraunces);
+  --font-display: var(--font-geist-sans);
+  --font-heading: var(--font-geist-sans);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);

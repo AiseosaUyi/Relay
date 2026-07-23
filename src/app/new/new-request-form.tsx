@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PLATFORM_LIST } from "@/lib/adaptation/platforms";
 import { createRequestAction, type CreateRequestState } from "./actions";
+import { User, AtSign, Mail, Link2, ArrowRight } from "lucide-react";
 
 const initialState: CreateRequestState = { error: null };
 
@@ -19,7 +20,10 @@ export function NewRequestForm({
   return (
     <Card className="mx-auto w-full max-w-md">
       <CardHeader>
-        <CardTitle className="font-heading text-xl">
+        <span className="mb-1 flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Link2 className="size-5" />
+        </span>
+        <CardTitle className="font-heading text-xl tracking-tight">
           {freelancerName ? `New request` : "Set up your recommendation page"}
         </CardTitle>
         <CardDescription>
@@ -31,17 +35,22 @@ export function NewRequestForm({
       <CardContent>
         <form action={formAction} className="space-y-4">
           {!freelancerName && (
-            <Field label="Your name">
-              <Input name="freelancerName" placeholder="Ada Lovelace" required />
+            <Field label="Your name" icon={User}>
+              <Input name="freelancerName" placeholder="Ada Lovelace" required className="pl-9" />
             </Field>
           )}
-          <Field label="Client name">
-            <Input name="clientName" placeholder="Grace Hopper" required />
+          <Field label="Client name" icon={AtSign}>
+            <Input name="clientName" placeholder="Grace Hopper" required className="pl-9" />
           </Field>
-          <Field label="Client email (optional)">
-            <Input name="clientEmail" type="email" placeholder="grace@example.com" />
+          <Field label="Client email (optional)" icon={Mail}>
+            <Input
+              name="clientEmail"
+              type="email"
+              placeholder="grace@example.com"
+              className="pl-9"
+            />
           </Field>
-          <fieldset className="space-y-2">
+          <fieldset className="space-y-2 pt-1">
             <legend className="text-sm font-medium text-foreground">
               Which platforms does this client need to appear on?
             </legend>
@@ -49,7 +58,7 @@ export function NewRequestForm({
               {PLATFORM_LIST.map((platform) => (
                 <label
                   key={platform.id}
-                  className="group/chip inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-wash px-3 py-1 text-sm font-medium text-foreground transition-colors has-checked:border-transparent has-checked:bg-primary/15 has-checked:text-primary"
+                  className="group/chip inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-wash px-3 py-1.5 text-sm font-medium text-foreground transition-colors has-checked:border-primary/30 has-checked:bg-primary/10 has-checked:text-primary"
                 >
                   <input
                     type="checkbox"
@@ -69,6 +78,7 @@ export function NewRequestForm({
           {state.error && <p className="text-sm text-destructive">{state.error}</p>}
           <Button type="submit" disabled={pending} className="w-full" size="lg">
             {pending ? "Creating…" : "Create request link"}
+            {!pending && <ArrowRight />}
           </Button>
         </form>
       </CardContent>
@@ -76,11 +86,22 @@ export function NewRequestForm({
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  icon: Icon,
+  children,
+}: {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block space-y-1.5">
       <span className="text-sm font-medium text-foreground">{label}</span>
-      {children}
+      <span className="relative flex items-center">
+        <Icon className="pointer-events-none absolute left-3 size-4 text-muted-foreground" />
+        {children}
+      </span>
     </label>
   );
 }
