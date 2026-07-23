@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFreelancerBySlug, listRequestsForFreelancer } from "@/lib/db/repository";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import type { Platform } from "@/lib/adaptation/platforms";
 import { CreatedBanner } from "./created-banner";
 import { RequestCard } from "./request-card";
+import { cn } from "@/lib/utils";
+import { RelayFlowIllustration } from "@/components/illustrations/relay-flow";
 
 export default async function DashboardPage(props: PageProps<"/dashboard/[slug]">) {
   const { slug } = await props.params;
@@ -34,14 +36,9 @@ export default async function DashboardPage(props: PageProps<"/dashboard/[slug]"
           <Link href="/" className="font-heading text-sm font-semibold tracking-tight">
             Relay
           </Link>
-          <Button
-            nativeButton={false}
-            render={
-              <Link href="/new">
-                <Plus /> New request
-              </Link>
-            }
-          />
+          <Link href="/new" className={buttonVariants()}>
+            <Plus /> New request
+          </Link>
         </div>
       </header>
 
@@ -67,21 +64,16 @@ export default async function DashboardPage(props: PageProps<"/dashboard/[slug]"
         {requests.length === 0 ? (
           <Card className="mt-6">
             <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
+              <RelayFlowIllustration className="mb-1 h-28 w-auto" />
               <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
                 No requests yet
               </h2>
               <p className="text-sm text-muted-foreground">
                 Create your first request and get a link to send a client.
               </p>
-              <Button
-                nativeButton={false}
-                className="mt-1"
-                render={
-                  <Link href="/new">
-                    <Plus /> New request
-                  </Link>
-                }
-              />
+              <Link href="/new" className={cn(buttonVariants(), "mt-1")}>
+                <Plus /> New request
+              </Link>
             </CardContent>
           </Card>
         ) : (

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { getFreelancerBySlug } from "@/lib/db/repository";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Copy } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { ArrowRight, Copy } from "lucide-react";
 import { PLATFORM_LIST } from "@/lib/adaptation/platforms";
+import { cn } from "@/lib/utils";
+import { RelayFlowIllustration } from "@/components/illustrations/relay-flow";
 
 const FREELANCER_COOKIE = "relay_freelancer_slug";
 
@@ -20,12 +22,8 @@ export default async function Home() {
       />
 
       <div className="relative flex w-full max-w-xl flex-col items-center text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-wash px-3 py-1 text-xs font-medium text-muted-foreground">
-          <Sparkles className="size-3.5 text-primary" />
-          Built for freelancers &amp; designers
-        </span>
-
-        <h1 className="mt-5 font-heading text-5xl font-bold tracking-tight text-balance text-foreground sm:text-6xl">
+        <RelayFlowIllustration className="h-24 w-auto sm:h-28" />
+        <h1 className="mt-4 font-heading text-5xl font-bold tracking-tight text-balance text-foreground sm:text-6xl">
           Write it <span className="text-primary">once</span>.
         </h1>
         <p className="mt-5 max-w-md text-balance text-base text-muted-foreground sm:text-lg">
@@ -34,17 +32,16 @@ export default async function Home() {
         </p>
 
         <div className="mt-9 flex justify-center">
-          <Button
-            size="lg"
-            nativeButton={false}
-            className="h-11 px-6 text-base shadow-[0_8px_24px_-8px_var(--color-brand)]"
-            render={
-              <Link href={freelancer ? `/dashboard/${freelancer.slug}` : "/new"}>
-                {freelancer ? "Go to your dashboard" : "Get started"}
-                <ArrowRight />
-              </Link>
-            }
-          />
+          <Link
+            href={freelancer ? `/dashboard/${freelancer.slug}` : "/new"}
+            className={cn(
+              buttonVariants({ size: "lg" }),
+              "h-11 px-6 text-base shadow-[0_8px_24px_-8px_var(--color-brand)]"
+            )}
+          >
+            {freelancer ? "Go to your dashboard" : "Get started"}
+            <ArrowRight />
+          </Link>
         </div>
       </div>
 

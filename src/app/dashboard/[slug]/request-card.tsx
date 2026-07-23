@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CircleCheck, Clock, Circle, Link2, Check } from "lucide-react";
+import { CircleCheck, Clock, Circle, Copy, Check } from "lucide-react";
 import { PLATFORMS, type Platform } from "@/lib/adaptation/platforms";
 
 export function RequestCard({
@@ -39,42 +38,56 @@ export function RequestCard({
         <div className="min-w-0 flex-1">
           <CardTitle>{clientName}</CardTitle>
           <p className="text-xs text-muted-foreground">
-            {new Date(createdAt).toLocaleDateString(undefined, {
+            {new Date(createdAt).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
               year: "numeric",
             })}
           </p>
         </div>
-        <Button variant="ghost" size="icon-sm" onClick={handleCopy} title="Copy request link">
-          {copied ? <Check className="text-primary" /> : <Link2 />}
-        </Button>
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-2">
-        {platforms.map((platform) => {
-          const variant = variants.find((v) => v.platform === platform);
-          const written = Boolean(variant?.text);
-          return (
-            <Badge
-              key={platform}
-              variant={written ? "default" : "outline"}
-              className={written ? "bg-primary/15 text-primary" : undefined}
-            >
-              {written ? (
-                <CircleCheck data-icon="inline-start" />
-              ) : (
-                <Clock data-icon="inline-start" />
-              )}
-              {PLATFORMS[platform].label}
+      <CardContent className="space-y-3">
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="flex w-full items-center gap-2 rounded-lg border border-border px-3 py-2 text-left transition-colors hover:bg-wash"
+        >
+          <span className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground">
+            /r/{slug}
+          </span>
+          {copied ? (
+            <Check className="size-3.5 shrink-0 text-primary" />
+          ) : (
+            <Copy className="size-3.5 shrink-0 text-muted-foreground" />
+          )}
+        </button>
+
+        <div className="flex flex-wrap gap-2">
+          {platforms.map((platform) => {
+            const variant = variants.find((v) => v.platform === platform);
+            const written = Boolean(variant?.text);
+            return (
+              <Badge
+                key={platform}
+                variant={written ? "default" : "outline"}
+                className={written ? "bg-primary/15 text-primary" : undefined}
+              >
+                {written ? (
+                  <CircleCheck data-icon="inline-start" />
+                ) : (
+                  <Clock data-icon="inline-start" />
+                )}
+                {PLATFORMS[platform].label}
+              </Badge>
+            );
+          })}
+          {!hasRawText && (
+            <Badge variant="ghost" className="text-muted-foreground">
+              <Circle data-icon="inline-start" />
+              Waiting on client
             </Badge>
-          );
-        })}
-        {!hasRawText && (
-          <Badge variant="ghost" className="text-muted-foreground">
-            <Circle data-icon="inline-start" />
-            Waiting on client
-          </Badge>
-        )}
+          )}
+        </div>
       </CardContent>
     </Card>
   );

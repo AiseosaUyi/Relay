@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Copy, Check, Loader2, Sparkles, Bell } from "lucide-react";
+import { Copy, Check, Loader2, ArrowRight, Bell } from "lucide-react";
 import { PLATFORMS, type Platform } from "@/lib/adaptation/platforms";
 import { submitRecommendation, recordCopy, type SubmitResult } from "./actions";
 
@@ -139,7 +139,8 @@ export function RecommendationForm({
           </>
         ) : (
           <>
-            <Sparkles /> Adapt for {platforms.length} platform{platforms.length === 1 ? "" : "s"}
+            Adapt for {platforms.length} platform{platforms.length === 1 ? "" : "s"}
+            <ArrowRight />
           </>
         )}
       </Button>
