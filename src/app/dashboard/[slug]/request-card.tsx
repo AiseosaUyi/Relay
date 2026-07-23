@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CircleCheck, Clock, Circle, Copy, Check } from "lucide-react";
+import { CircleCheck, Clock, Circle, Copy, Check, X } from "lucide-react";
 import { PLATFORMS, type Platform } from "@/lib/adaptation/platforms";
+import { copyToClipboard } from "@/lib/utils";
 
 export function RequestCard({
   clientName,
@@ -21,12 +22,12 @@ export function RequestCard({
   variants: { platform: Platform; text: string | null }[];
   hasRawText: boolean;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(`${window.location.origin}/r/${slug}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    const ok = await copyToClipboard(`${window.location.origin}/r/${slug}`);
+    setStatus(ok ? "copied" : "error");
+    setTimeout(() => setStatus("idle"), 1500);
   }
 
   return (
@@ -55,11 +56,9 @@ export function RequestCard({
           <span className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground">
             /r/{slug}
           </span>
-          {copied ? (
-            <Check className="size-3.5 shrink-0 text-primary" />
-          ) : (
-            <Copy className="size-3.5 shrink-0 text-muted-foreground" />
-          )}
+          {status === "copied" && <Check className="size-3.5 shrink-0 text-primary" />}
+          {status === "error" && <X className="size-3.5 shrink-0 text-destructive" />}
+          {status === "idle" && <Copy className="size-3.5 shrink-0 text-muted-foreground" />}
         </button>
 
         <div className="flex flex-wrap gap-2">

@@ -4,9 +4,10 @@ import { useState, useTransition } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Copy, Check, Loader2, ArrowRight, Bell } from "lucide-react";
+import { Copy, Check, X, Loader2, ArrowRight, Bell } from "lucide-react";
 import { PLATFORMS, type Platform } from "@/lib/adaptation/platforms";
 import { PlatformIcon } from "@/components/icons/platform-icon";
+import { copyToClipboard } from "@/lib/utils";
 import { submitRecommendation, recordCopy, type SubmitResult } from "./actions";
 
 type Variant = { platform: Platform; text: string; generatedBy: "ai" | "fallback" };
@@ -158,19 +159,21 @@ function CopyButton({
   text: string;
   label: string;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    recordCopy(slug, platform);
-    setTimeout(() => setCopied(false), 1500);
+    const ok = await copyToClipboard(text);
+    setStatus(ok ? "copied" : "error");
+    if (ok) recordCopy(slug, platform);
+    setTimeout(() => setStatus("idle"), 1500);
   }
 
   return (
     <Button variant="outline" onClick={handleCopy}>
-      {copied ? <Check className="text-primary" /> : <Copy />}
-      {copied ? "Copied" : label}
+      {status === "copied" && <Check className="text-primary" />}
+      {status === "error" && <X className="text-destructive" />}
+      {status === "idle" && <Copy />}
+      {status === "copied" ? "Copied" : status === "error" ? "Couldn't copy" : label}
     </Button>
   );
 }

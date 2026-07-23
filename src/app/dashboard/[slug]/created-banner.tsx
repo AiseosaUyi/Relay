@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, X } from "lucide-react";
+import { copyToClipboard } from "@/lib/utils";
 
 export function CreatedBanner({ slug }: { slug: string }) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
   const path = `/r/${slug}`;
 
   async function handleCopy() {
     const url = `${window.location.origin}${path}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    const ok = await copyToClipboard(url);
+    setStatus(ok ? "copied" : "error");
+    setTimeout(() => setStatus("idle"), 1500);
   }
 
   return (
@@ -24,8 +25,10 @@ export function CreatedBanner({ slug }: { slug: string }) {
           <p className="truncate text-sm text-muted-foreground">{path}</p>
         </div>
         <Button variant="outline" onClick={handleCopy}>
-          {copied ? <Check className="text-primary" /> : <Copy />}
-          {copied ? "Copied" : "Copy link"}
+          {status === "copied" && <Check className="text-primary" />}
+          {status === "error" && <X className="text-destructive" />}
+          {status === "idle" && <Copy />}
+          {status === "copied" ? "Copied" : status === "error" ? "Couldn't copy" : "Copy link"}
         </Button>
       </CardContent>
     </Card>
