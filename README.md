@@ -42,18 +42,18 @@ in `data/relay-v2.db` (git-ignored). Delete it to start over.
 
 ## AI adaptation
 
-Set `AI_GATEWAY_API_KEY` (Vercel AI Gateway) to turn it on. Default model is
-`anthropic/claude-haiku-4.5`, about $0.005 to $0.01 per recommendation. Without a key, Relay
-trims the client's own words to fit each limit and labels them as not AI adapted.
+Set `OPENAI_API_KEY` to turn it on. Default model is `gpt-4.1-mini`; override it with
+`RELAY_AI_MODEL`. Without a key, Relay trims the client's own words to fit each limit and labels
+them as not AI adapted.
 
 ## Deploy for free
 
 1. **Database.** Create a free Turso database, then set `DATABASE_URL` (libsql://...) and
    `DATABASE_AUTH_TOKEN`. Tables are created on first request.
 2. **Vercel.** Import this repo on the Hobby plan. Set `OWNER_PASSWORD`, the two database
-   variables and, optionally, `AI_GATEWAY_API_KEY`.
-3. **AI budget.** In the AI Gateway dashboard, add $5 of credit and a monthly budget so a leaked
-   link can never cost more than that.
+   variables and, optionally, `OPENAI_API_KEY`.
+3. **AI budget.** In the OpenAI dashboard, set a small monthly spend limit so a leaked link can
+   never cost more than that.
 
 See `.env.example` for every variable.
 

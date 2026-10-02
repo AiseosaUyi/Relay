@@ -176,7 +176,7 @@ export const DESTINATIONS: Record<DestinationId, Destination> = {
     verified: true,
     link: "linkedin",
     tone:
-      "LinkedIn recommendation. Third person about the freelancer, from the client's point of view. Open with how they worked together, then what the freelancer did and what kind of collaborator they are. Warm and professional, no hashtags, no emojis.",
+      "LinkedIn recommendation, written by the client in first person (I, we) about the freelancer, who is referred to by name or with the pronoun the client used. Never mention the client by name. Open with how they worked together, then what the freelancer did. Warm and professional, no hashtags, no emojis.",
     clientSteps: ({ ownerName, link }) => [
       `Watch for a LinkedIn message titled "Write ${ownerName} a recommendation" and paste this in.`,
       link

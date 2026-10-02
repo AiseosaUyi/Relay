@@ -60,11 +60,11 @@ Upwork (retired), Fiverr standard, Freelancer.com, PeoplePerHour, Guru, Workana,
 - Cost guard. One adaptation plus 3 redos per link, edits never call the AI.
 
 ### Costs for a self tool
-Vercel Hobby, Turso free and no email service, so $0 a month. AI is the only spend, about $0.005 to $0.01 per recommendation on Haiku 4.5. Add $5 of AI Gateway credit with a budget, or run without a key and Relay trims the client's words instead of rewriting.
+Vercel Hobby, Turso free and no email service, so $0 a month. AI is the only spend, a fraction of a cent per recommendation on OpenAI. Set a small monthly limit in the OpenAI dashboard, or run without a key and Relay trims the client's words instead of rewriting.
 
 ### Your setup
 1. Create a free Turso database, copy its URL and token.
-2. Import the repo on Vercel Hobby, set `OWNER_PASSWORD`, `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, optionally `AI_GATEWAY_API_KEY`.
+2. Import the repo on Vercel Hobby, set `OWNER_PASSWORD`, `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, optionally `OPENAI_API_KEY`.
 3. Settings, fill in your profile links.
 4. Optional. Send one Contra review request to a second email of yours to confirm the client form and the character limit.
 

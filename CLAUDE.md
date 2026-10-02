@@ -50,11 +50,12 @@ means open; no password in production means locked. The client page `/r/[slug]` 
 destinations of a request. Length targets live in `.describe()`, not zod `.max()`, and are
 enforced by trimming after generation (a `.max()` failure used to throw away the whole object).
 Any AI failure falls back per destination to the client's own words trimmed to fit, labelled
-`fallback`. AI is on when `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN` is set.
+`fallback`. AI is on when `OPENAI_API_KEY` is set (OpenAI only, via `@ai-sdk/openai`; default model `gpt-4.1-mini`,
+override with `RELAY_AI_MODEL`).
 
 **Cost guard:** public actions cap AI calls per link at one adaptation plus
 `MAX_REGENERATIONS` (3). Edits, copies and consent changes never call the model. Also set a
-budget in the AI Gateway dashboard.
+monthly spend limit in the OpenAI dashboard.
 
 **Icon system** (`src/components/icons/platform-icon.tsx`): one lookup (`PlatformIcon`) used
 everywhere a destination needs a visual mark, so brand icons aren't hand-duplicated per call site.
