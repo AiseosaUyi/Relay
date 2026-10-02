@@ -34,7 +34,7 @@ export default async function RequestPage(props: PageProps<"/requests/[slug]">) 
           <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
             Recommendations
           </Link>
-          <h1 className="mt-1 font-heading text-2xl font-bold tracking-tight text-foreground">{request.client_name}</h1>
+          <h1 className="mt-1 font-heading text-2xl font-semibold tracking-tight text-foreground">{request.client_name}</h1>
           <p className="text-sm text-muted-foreground">
             {request.client_email ? `${request.client_email} · ` : ""}
             Created {new Date(request.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
@@ -47,7 +47,7 @@ export default async function RequestPage(props: PageProps<"/requests/[slug]">) 
         </section>
 
         {!request.raw_text && (
-          <Card className={cn(searchParams.created && "border-primary/30 bg-primary/5")}>
+          <Card className={cn(searchParams.created && "border-signal/30 bg-signal/5")}>
             <CardContent className="space-y-4">
               <div>
                 <p className="font-medium text-foreground">
@@ -75,7 +75,7 @@ export default async function RequestPage(props: PageProps<"/requests/[slug]">) 
 
         {request.raw_text && (
           <section className="space-y-2">
-            <h2 className="font-heading text-lg font-bold tracking-tight">What {request.client_name} wrote</h2>
+            <h2 className="font-heading text-lg font-semibold tracking-tight">What {request.client_name} wrote</h2>
             <blockquote className="rounded-2xl bg-card p-4 text-sm whitespace-pre-wrap text-foreground ring-1 ring-foreground/10">
               {request.raw_text}
             </blockquote>
@@ -96,7 +96,7 @@ export default async function RequestPage(props: PageProps<"/requests/[slug]">) 
           return (
             <section key={group} className="space-y-3">
               <div>
-                <h2 className="font-heading text-lg font-bold tracking-tight">{GROUP_META[group].title}</h2>
+                <h2 className="font-heading text-lg font-semibold tracking-tight">{GROUP_META[group].title}</h2>
                 <p className="text-sm text-muted-foreground">{GROUP_META[group].description}</p>
               </div>
               <ul className="space-y-3">

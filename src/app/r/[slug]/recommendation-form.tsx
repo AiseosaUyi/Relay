@@ -125,10 +125,10 @@ function WriteView({
   return (
     <div className="space-y-6">
       <div className="flex flex-col items-center text-center">
-        <span className="flex size-11 items-center justify-center rounded-full bg-wash text-lg font-semibold text-foreground">
+        <span className="flex size-11 items-center justify-center rounded-full bg-foreground text-lg font-semibold text-background">
           {ownerName.charAt(0).toUpperCase()}
         </span>
-        <h1 className="mt-4 font-heading text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
+        <h1 className="mt-4 font-heading text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
           {existing ? "Edit what you wrote" : `Hi ${first}, write a recommendation for ${ownerName}`}
         </h1>
         <p className="mt-2 max-w-md text-sm text-muted-foreground">
@@ -140,7 +140,7 @@ function WriteView({
 
       {context && !existing && (
         <div className="flex items-start gap-2.5 rounded-xl bg-wash px-3.5 py-3 text-sm text-muted-foreground">
-          <Info className="mt-0.5 size-4 shrink-0 text-primary" />
+          <Info className="mt-0.5 size-4 shrink-0 text-signal" />
           <span>
             <span className="font-medium text-foreground">What you worked on together.</span> {context}
           </span>
@@ -166,7 +166,7 @@ function WriteView({
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsentLocal(e.target.checked)}
-          className="mt-0.5 size-4 accent-[var(--color-brand)]"
+          className="mt-0.5 size-4 accent-[var(--color-signal)]"
         />
         <span>
           {ownerName} can quote this, with my name, on their website and in proposals. <span className="text-muted-foreground/70">Optional.</span>
@@ -249,10 +249,10 @@ function ResultsView({
   return (
     <div className="animate-in space-y-8 fade-in-0 duration-300">
       <div className="flex flex-col items-center text-center">
-        <span className="flex size-11 animate-in items-center justify-center rounded-full bg-primary/10 text-primary zoom-in-50 duration-300">
+        <span className="flex size-11 animate-in items-center justify-center rounded-full bg-signal/10 text-signal zoom-in-50 duration-300">
           <Check className="size-5" strokeWidth={2.5} />
         </span>
-        <h1 className="mt-4 font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Thank you. You&apos;re all set.</h1>
+        <h1 className="mt-4 font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Thank you. You&apos;re all set.</h1>
         <p className="mt-2 max-w-md text-sm text-muted-foreground">
           Everything is saved on this link, so you can come back any time. Paste each version when that platform&apos;s request reaches you.
         </p>
@@ -264,7 +264,7 @@ function ResultsView({
         return (
           <section key={group} className="space-y-3">
             <div>
-              <h2 className="font-heading text-lg font-bold tracking-tight text-foreground">{title}</h2>
+              <h2 className="font-heading text-lg font-semibold tracking-tight text-foreground">{title}</h2>
               <p className="text-sm text-muted-foreground">{blurb}</p>
             </div>
             {items.map((d) => {
@@ -294,7 +294,7 @@ function ResultsView({
             checked={state.consentPublic}
             disabled={consentSaving}
             onChange={(e) => toggleConsent(e.target.checked)}
-            className="mt-0.5 size-4 accent-[var(--color-brand)]"
+            className="mt-0.5 size-4 accent-[var(--color-signal)]"
           />
           <span>{ownerName} can quote this, with my name, on their website and in proposals.</span>
         </label>
@@ -437,7 +437,7 @@ function Linkified({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         /^https?:\/\//.test(part) ? (
-          <a key={i} href={part} target="_blank" rel="noreferrer" className="break-all text-primary underline underline-offset-2">
+          <a key={i} href={part} target="_blank" rel="noreferrer" className="break-all text-signal underline underline-offset-2">
             {part}
           </a>
         ) : (

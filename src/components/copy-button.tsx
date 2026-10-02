@@ -29,7 +29,7 @@ export function CopyButton({
 
   return (
     <Button type="button" variant={variant} size={size} onClick={handleCopy}>
-      {status === "copied" && <Check className="text-primary" />}
+      {status === "copied" && <Check className="text-signal" />}
       {status === "error" && <X className="text-destructive" />}
       {status === "idle" && <Copy />}
       {status === "copied" ? "Copied" : status === "error" ? "Couldn't copy" : label}

@@ -25,7 +25,7 @@ export function SettingsForm({
         {state.error && <p className="text-sm text-destructive">{state.error}</p>}
         {state.saved && !state.error && (
           <p className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-            <Check className="size-4 text-primary" /> Saved
+            <Check className="size-4 text-signal" /> Saved
           </p>
         )}
       </div>

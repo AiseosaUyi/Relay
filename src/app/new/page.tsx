@@ -14,7 +14,7 @@ export default async function NewRequestPage() {
     <main className="min-h-svh w-full">
       <OwnerHeader />
       <div className="mx-auto w-full max-w-3xl px-6 py-8">
-        <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">New request</h1>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground">New request</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Pick where this client&apos;s recommendation should end up. You&apos;ll get one link to send them.
         </p>

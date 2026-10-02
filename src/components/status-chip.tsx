@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 const STYLE: Record<VariantStatus, string> = {
   waiting: "border-border text-muted-foreground",
   no_consent: "border-border text-muted-foreground/70 line-through",
-  ready: "border-primary/20 bg-primary/5 text-foreground",
-  copied: "border-primary/25 bg-primary/10 text-foreground",
-  sent: "border-primary/30 bg-primary/10 text-primary",
+  ready: "border-signal/25 bg-signal/5 text-foreground",
+  copied: "border-signal/30 bg-signal/10 text-foreground",
+  sent: "border-signal/40 bg-signal/10 text-signal",
   live: "border-transparent bg-primary text-primary-foreground",
 };
 

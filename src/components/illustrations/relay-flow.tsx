@@ -36,7 +36,7 @@ export function RelayFlowIllustration({ className }: { className?: string }) {
         <path
           key={`${t.id}-active`}
           d={`M 54 100 C 130 100, 130 ${t.y}, 206 ${t.y}`}
-          className="stroke-primary/40"
+          className="stroke-signal/60"
           strokeWidth="2"
           strokeLinecap="round"
           pathLength={100}

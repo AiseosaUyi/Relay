@@ -21,7 +21,7 @@ export function DestinationPicker({ selected }: { selected: DestinationId[] }) {
                 <label
                   key={d.id}
                   title={d.audience}
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-wash px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors has-checked:border-primary/30 has-checked:bg-primary/10 has-checked:text-primary has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-wash px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors has-checked:border-signal/30 has-checked:bg-signal/10 has-checked:text-signal has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
                 >
                   <input
                     type="checkbox"
