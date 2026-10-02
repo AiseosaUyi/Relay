@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Recommendation Relay",
+  title: "Relay",
   description:
-    "Write a recommendation once. We adapt it for LinkedIn, Upwork, and Contra.",
+    "Your client writes one recommendation. Relay gets it ready for LinkedIn, Contra and every other place it belongs.",
 };
 
 export default function RootLayout({

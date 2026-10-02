@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@libsql/client": "^0.18.0",
     "ai": "^7.0.35",
-    "better-sqlite3": "^13.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.25.0",
@@ -21,6 +21,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-icons": "^5.7.0",
+    "server-only": "^0.0.1",
     "shadcn": "^4.13.1",
     "simple-icons": "^16.27.0",
     "tailwind-merge": "^3.6.0",
@@ -29,7 +30,6 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

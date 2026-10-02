@@ -1,28 +1,30 @@
-import { cookies } from "next/headers";
-import { getFreelancerBySlug } from "@/lib/db/repository";
+import { redirect } from "next/navigation";
+import { OwnerHeader } from "@/components/owner-header";
+import { PageHeader } from "@/components/page-header";
+import { requireOwner } from "@/lib/auth";
+import { getSettings } from "@/lib/db/repository";
+import { DEFAULT_DESTINATIONS } from "@/lib/destinations/registry";
 import { NewRequestForm } from "./new-request-form";
-import { Logo } from "@/components/logo";
-
-const FREELANCER_COOKIE = "relay_freelancer_slug";
 
 export default async function NewRequestPage() {
-  const cookieStore = await cookies();
-  const slug = cookieStore.get(FREELANCER_COOKIE)?.value;
-  const freelancer = slug ? getFreelancerBySlug(slug) : undefined;
+  await requireOwner("/new");
+  const settings = await getSettings();
+  if (!settings) redirect("/settings?welcome=1");
 
   return (
-    <main className="relative flex min-h-svh w-full flex-col items-center overflow-hidden px-6 py-16">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-[-14rem] left-1/2 h-[32rem] w-[56rem] -translate-x-1/2 rounded-full bg-primary/10 blur-[110px]"
-      />
-
-      <header className="relative z-10 w-full max-w-2xl">
-        <Logo href={freelancer ? `/dashboard/${freelancer.slug}` : "/"} />
-      </header>
-
-      <div className="relative flex flex-1 w-full items-center justify-center">
-        <NewRequestForm freelancerName={freelancer?.name ?? null} />
+    <main className="min-h-svh w-full">
+      <OwnerHeader />
+      <div className="page-enter mx-auto w-full max-w-3xl px-6 py-12">
+        <PageHeader
+          back={{ href: "/dashboard", label: "Recommendations" }}
+          title="New request"
+          description="Pick where this client's recommendation should end up. You'll get one link to send them."
+        />
+        <div className="mt-10">
+          <NewRequestForm
+            defaults={settings.default_destinations.length ? settings.default_destinations : DEFAULT_DESTINATIONS}
+          />
+        </div>
       </div>
     </main>
   );

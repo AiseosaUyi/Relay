@@ -1,28 +1,24 @@
 /**
- * Custom mark, not a stock icon: a single baton hand-off — a filled "you"
- * dot passing to an open "them" dot — the same fill-vs-outline language
- * used for source/target nodes throughout the product. Deliberately one
- * bold gesture so it still reads clearly at favicon/nav scale, unlike a
- * multi-curve illustration.
+ * The Relay mark: a closing quote mark where the colour is handed from the
+ * first comma (ink, the client's words) to the second (signal, the same
+ * words passed on). One idea, two shapes, readable at favicon size.
  *
- * Decorative (aria-hidden): every usage sits directly beside the visible
- * "Relay" wordmark, so giving the icon its own aria-label would double up
- * the accessible name (screen readers announcing "Relay Relay").
+ * Decorative (aria-hidden): every usage sits beside the visible "relay"
+ * wordmark, so the icon gets no label of its own.
  */
+const COMMA_TAIL = "M12.1 13.6C12.5 18.6 10.3 22 6 24.2";
+
 export function RelayMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <line
-        x1="8"
-        y1="16"
-        x2="13.8"
-        y2="10.2"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <circle cx="7" cy="17" r="3" fill="currentColor" />
-      <circle cx="17" cy="7" r="2.75" fill="none" stroke="currentColor" strokeWidth="2.5" />
+    <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden="true">
+      <g className="fill-current stroke-current" strokeWidth="3.4" strokeLinecap="round">
+        <circle cx="9" cy="11" r="4.6" stroke="none" />
+        <path d={COMMA_TAIL} />
+      </g>
+      <g className="fill-signal stroke-signal" strokeWidth="3.4" strokeLinecap="round">
+        <circle cx="22" cy="11" r="4.6" stroke="none" />
+        <path d={COMMA_TAIL} transform="translate(13 0)" />
+      </g>
     </svg>
   );
 }

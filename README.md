@@ -1,65 +1,63 @@
-# Recommendation Relay
+# Relay
 
-Write a recommendation once. We adapt it for LinkedIn, Upwork, and Contra — the only three
-freelance/design platforms that actually have a client-recommendation feature (verified during
-design; Fiverr, Behance, Dribbble, 99designs, and Toptal don't).
+A personal tool for collecting client recommendations. You send a client one link. They write
+their recommendation once, and Relay gets it ready for every place it belongs: LinkedIn, Contra,
+Malt and other profile platforms, posts from their own account, review sites like Clutch or
+Google, and quotes for your own site and proposals.
 
-No platform lets a third party post a recommendation on someone's behalf — the client always
-writes and submits it themselves, on that platform, logged in as themselves. This tool doesn't
-try to get around that. It's a drafting + tracking assistant: the client writes their
-recommendation once here, gets it adapted per platform (length/tone), and knows exactly what to
-paste in when each platform's own native request lands in their inbox.
+Nothing is ever posted for anyone. Every platform makes the client submit it themselves, so
+Relay drafts, tracks and reminds. Upwork was dropped in Oct 2026 when it stopped accepting new
+testimonial requests. The research behind every destination is in `BUILD_PLAN.md`.
 
-See the full design doc and build plan at
-`~/.gstack/projects/Recommend/aiseosauyi-idahor-main-design-20260723-001122.md`.
-
-## Getting started
+## Run it locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the printed local URL (defaults to `http://localhost:3000`, falls back to the next free
-port if that's taken).
+Open http://localhost:3000. With no `OWNER_PASSWORD` set, local dev skips the login. Data lives
+in `data/relay-v2.db` (git-ignored). Delete it to start over.
 
-- `/` — landing page
-- `/new` — freelancer sets up (first visit) or adds a new client request
-- `/dashboard/[slug]` — freelancer's request list, reached automatically after `/new`
-- `/r/[slug]` — the link you send your client; they write their recommendation here
+## How it works
 
-No account or API key is required to try the core loop. Data persists locally in a
-git-ignored SQLite file at `data/relay.db` — delete that file (or the whole `data/` folder) to
-reset to a clean state.
+1. **Settings** (first run). Your name, the profile and review links clients need, and the
+   destinations new requests start with.
+2. **New request.** Client name, optional email and context, which destinations apply. You get a
+   link plus a message you can paste into WhatsApp or email. Relay never sends anything.
+3. **Client page** (`/r/[slug]`). The client writes once, optionally lets you quote them, and
+   gets an editable version per destination with step by step instructions. They can redo
+   versions up to 3 times per link, or switch any version back to their exact words.
+4. **Request page.** What they wrote, every version, your part on each platform, and buttons to
+   mark "I sent the platform request" and "Live".
 
-## Enabling real AI adaptation
+### Destination groups
 
-Without any configuration, recommendation text is adapted with a simple deterministic
-formatter (trims to each platform's character limit on a sentence boundary) — the app is fully
-usable this way, and every adapted variant is labeled "Adapted with simple formatting" so it's
-honest about which mode produced it.
+| Group | Text | Who sees it |
+|---|---|---|
+| Profile recommendations (LinkedIn, Contra, Malt, Twine, Codeur, YunoJuno, Fiverr Pro, LinkedIn Services, ProZ) | AI adapted, client edits | Client |
+| Posts from the client's account (X, LinkedIn) | AI adapted, client edits | Client |
+| Review sites (Clutch, Google, Trustpilot, Sortlist, Bark, Thumbtack, Facebook) | The client's own words, never AI. These sites forbid pre-written reviews | Client |
+| Your own assets (website testimonial, case study quote, proposal quote, one-liner) | AI adapted | You, only if the client consented |
 
-To turn on real AI-adapted variants (tone-aware, not just length-trimmed), set an environment
-variable before starting the dev server:
+## AI adaptation
 
-```bash
-AI_GATEWAY_API_KEY=your_key npm run dev
-```
+Set `AI_GATEWAY_API_KEY` (Vercel AI Gateway) to turn it on. Default model is
+`anthropic/claude-haiku-4.5`, about $0.005 to $0.01 per recommendation. Without a key, Relay
+trims the client's own words to fit each limit and labels them as not AI adapted.
 
-Get a key from the [Vercel AI Gateway](https://vercel.com/docs/ai-gateway). Once this repo is
-linked to a Vercel project (`vercel link`), prefer `vercel env pull` (OIDC) over a manually
-rotated key.
+## Deploy for free
 
-## What's not built yet
+1. **Database.** Create a free Turso database, then set `DATABASE_URL` (libsql://...) and
+   `DATABASE_AUTH_TOKEN`. Tables are created on first request.
+2. **Vercel.** Import this repo on the Hobby plan. Set `OWNER_PASSWORD`, the two database
+   variables and, optionally, `AI_GATEWAY_API_KEY`.
+3. **AI budget.** In the AI Gateway dashboard, add $5 of credit and a monthly budget so a leaked
+   link can never cost more than that.
 
-Per the design doc's incremental build plan, this repo currently covers the write-once/adapt
-core loop and freelancer request tracking (data model Next Steps 1–5). Not yet built: reminder
-scheduling/resurfacing, the quote library, and conversion tracking (Next Steps 6–10) — these are
-explicitly gated on validating that the core loop gets real use first, and need real
-transactional email infrastructure this environment doesn't have configured.
+See `.env.example` for every variable.
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind · shadcn/ui (`base-nova`, on `@base-ui/react`) ·
-Vercel AI SDK (with a no-AI fallback) · SQLite for local dev persistence (swap for Supabase in
-production — the whole data layer goes through `src/lib/db/repository.ts`).
+Next.js 16 (App Router, server actions) · TypeScript · Tailwind v4 · shadcn/ui on Base UI ·
+Vercel AI SDK v7 · libSQL (`@libsql/client`, local file or Turso).

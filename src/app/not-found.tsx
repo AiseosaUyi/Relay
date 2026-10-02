@@ -1,44 +1,29 @@
-import { cookies } from "next/headers";
 import Link from "next/link";
-import { getFreelancerBySlug } from "@/lib/db/repository";
+import { ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
-import { ArrowRight } from "lucide-react";
+import { RelayMark } from "@/components/icons/relay-mark";
 import { cn } from "@/lib/utils";
 
-const FREELANCER_COOKIE = "relay_freelancer_slug";
-
-export default async function NotFound() {
-  const cookieStore = await cookies();
-  const slug = cookieStore.get(FREELANCER_COOKIE)?.value;
-  const freelancer = slug ? getFreelancerBySlug(slug) : undefined;
-
+export default function NotFound() {
   return (
-    <main className="relative flex min-h-svh w-full flex-col items-center overflow-hidden px-6 py-16">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-[-14rem] left-1/2 h-[32rem] w-[56rem] -translate-x-1/2 rounded-full bg-primary/10 blur-[110px]"
-      />
-
-      <header className="relative z-10 w-full max-w-2xl">
-        <Logo href={freelancer ? `/dashboard/${freelancer.slug}` : "/"} />
+    <main className="flex min-h-svh w-full flex-col items-center px-6 py-10">
+      <header className="w-full max-w-3xl">
+        <Logo href="/" />
       </header>
 
-      <div className="relative flex flex-1 w-full flex-col items-center justify-center text-center">
-        <span className="font-heading text-sm font-semibold tracking-tight text-primary">
-          404
+      <div className="page-enter flex w-full flex-1 flex-col items-center justify-center pb-16 text-center">
+        <span className="flex size-16 items-center justify-center rounded-2xl bg-card text-foreground ring-1 ring-foreground/10">
+          <RelayMark className="size-9" />
         </span>
-        <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
+        <h1 className="mt-8 font-heading text-[2rem] leading-[1.1] font-semibold tracking-[-0.04em] text-balance text-foreground sm:text-[2.5rem]">
           Nothing to relay here.
         </h1>
-        <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-          The link you followed doesn&apos;t lead anywhere. Double-check it, or head back.
+        <p className="mt-3 max-w-sm text-[0.9375rem] leading-relaxed text-muted-foreground">
+          The link you followed doesn&apos;t lead anywhere. If someone sent it to you, ask them for a fresh one.
         </p>
-        <Link
-          href={freelancer ? `/dashboard/${freelancer.slug}` : "/"}
-          className={cn(buttonVariants({ size: "lg" }), "mt-6")}
-        >
-          {freelancer ? "Go to your dashboard" : "Back home"}
+        <Link href="/" className={cn(buttonVariants({ size: "lg" }), "mt-8")}>
+          Back home
           <ArrowRight />
         </Link>
       </div>

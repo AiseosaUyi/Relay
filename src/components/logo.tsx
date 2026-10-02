@@ -7,12 +7,12 @@ export function Logo({ href, className }: { href: string; className?: string }) 
     <Link
       href={href}
       className={cn(
-        "group/logo inline-flex items-center gap-1.5 font-heading text-base font-bold tracking-tight text-foreground transition-colors hover:text-primary",
+        "inline-flex items-center gap-1.5 font-heading text-[1.15rem] leading-none font-semibold tracking-[-0.04em] text-foreground",
         className
       )}
     >
-      <RelayMark className="size-5" />
-      Relay
+      <RelayMark className="size-6" />
+      relay
     </Link>
   );
 }
