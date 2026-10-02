@@ -1,180 +1,326 @@
+import "server-only";
 import { nanoid } from "nanoid";
-import { db } from "./client";
-import { PLATFORMS, type Platform } from "@/lib/adaptation/platforms";
+import type { Row } from "@libsql/client";
+import { getDb } from "./client";
+import {
+  parseDestinations,
+  type DestinationId,
+  type OwnerLinks,
+} from "@/lib/destinations/registry";
+import type { GeneratedBy } from "@/lib/adaptation/adapt";
 
-export type Freelancer = {
-  id: string;
-  slug: string;
-  name: string;
-  created_at: string;
-};
-
-export type VariantStatus =
-  | "pending"
-  | "adapted"
-  | "request_sent"
-  | "reminder_scheduled"
-  | "submitted";
-
-export type Variant = {
-  id: string;
-  request_id: string;
-  platform: Platform;
-  text: string | null;
-  char_limit: number;
-  status: VariantStatus;
-  generated_by: "ai" | "fallback" | null;
-  client_copied_at: string | null;
-  submitted_at: string | null;
-  resurfacing_disabled: number;
-  created_at: string;
+export type Settings = {
+  owner_name: string;
+  owner_role: string | null;
+  links: OwnerLinks;
+  default_destinations: DestinationId[];
 };
 
 export type RecommendationRequest = {
   id: string;
-  freelancer_id: string;
   slug: string;
   client_name: string;
   client_email: string | null;
-  platforms: string; // JSON-encoded Platform[]
+  context: string | null;
+  destinations: DestinationId[];
   raw_text: string | null;
+  consent_public: boolean;
+  consent_at: string | null;
+  regen_count: number;
   created_at: string;
+  submitted_at: string | null;
 };
 
-function slugId() {
-  // 12-char, URL-safe. Regeneration-on-collision is handled by the unique
-  // constraint + retry in createFreelancer/createRequest below.
-  return nanoid(12);
+export type Variant = {
+  id: string;
+  request_id: string;
+  destination: DestinationId;
+  text: string | null;
+  generated_text: string | null;
+  generated_by: GeneratedBy | null;
+  edited: boolean;
+  copied_at: string | null;
+  request_sent_at: string | null;
+  live_at: string | null;
+  live_url: string | null;
+};
+
+export type RequestWithVariants = RecommendationRequest & { variants: Variant[] };
+
+export const MAX_REGENERATIONS = 3;
+export const CONSENT_VERSION = "2026-10-v1";
+
+const now = () => new Date().toISOString();
+
+function str(v: unknown): string | null {
+  return v === null || v === undefined ? null : String(v);
 }
 
-export function createFreelancer(name: string): Freelancer {
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const slug = slugId();
-    try {
-      const id = nanoid();
-      const created_at = new Date().toISOString();
-      db.prepare(
-        `INSERT INTO freelancers (id, slug, name, created_at) VALUES (?, ?, ?, ?)`
-      ).run(id, slug, name, created_at);
-      return { id, slug, name, created_at };
-    } catch (err) {
-      if (attempt === 4) throw err;
-      // unique constraint collision on slug — retry with a fresh one
-    }
+function safeJson<T>(value: unknown, fallback: T): T {
+  try {
+    return value ? (JSON.parse(String(value)) as T) : fallback;
+  } catch {
+    return fallback;
   }
-  throw new Error("Failed to create freelancer after retries");
 }
 
-export function getFreelancerBySlug(slug: string): Freelancer | undefined {
-  return db
-    .prepare(`SELECT * FROM freelancers WHERE slug = ?`)
-    .get(slug) as Freelancer | undefined;
+function toRequest(row: Row): RecommendationRequest {
+  return {
+    id: String(row.id),
+    slug: String(row.slug),
+    client_name: String(row.client_name),
+    client_email: str(row.client_email),
+    context: str(row.context),
+    destinations: parseDestinations(str(row.destinations)),
+    raw_text: str(row.raw_text),
+    consent_public: Number(row.consent_public) === 1,
+    consent_at: str(row.consent_at),
+    regen_count: Number(row.regen_count ?? 0),
+    created_at: String(row.created_at),
+    submitted_at: str(row.submitted_at),
+  };
 }
 
-export function getFreelancerById(id: string): Freelancer | undefined {
-  return db.prepare(`SELECT * FROM freelancers WHERE id = ?`).get(id) as Freelancer | undefined;
+function toVariant(row: Row): Variant {
+  return {
+    id: String(row.id),
+    request_id: String(row.request_id),
+    destination: String(row.destination) as DestinationId,
+    text: str(row.text),
+    generated_text: str(row.generated_text),
+    generated_by: str(row.generated_by) as GeneratedBy | null,
+    edited: Number(row.edited) === 1,
+    copied_at: str(row.copied_at),
+    request_sent_at: str(row.request_sent_at),
+    live_at: str(row.live_at),
+    live_url: str(row.live_url),
+  };
 }
 
-export function createRequest(input: {
-  freelancerId: string;
+// ── Settings ──────────────────────────────────────────────────────────────
+
+export async function getSettings(): Promise<Settings | null> {
+  const db = await getDb();
+  const { rows } = await db.execute(`SELECT * FROM settings WHERE id = 1`);
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    owner_name: String(row.owner_name),
+    owner_role: str(row.owner_role),
+    links: safeJson<OwnerLinks>(row.links, {}),
+    default_destinations: parseDestinations(str(row.default_destinations)),
+  };
+}
+
+export async function saveSettings(input: Settings) {
+  const db = await getDb();
+  await db.execute({
+    sql: `INSERT INTO settings (id, owner_name, owner_role, links, default_destinations, updated_at)
+          VALUES (1, ?, ?, ?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET owner_name = excluded.owner_name, owner_role = excluded.owner_role,
+            links = excluded.links, default_destinations = excluded.default_destinations, updated_at = excluded.updated_at`,
+    args: [
+      input.owner_name,
+      input.owner_role,
+      JSON.stringify(input.links),
+      JSON.stringify(input.default_destinations),
+      now(),
+    ],
+  });
+}
+
+// ── Requests ──────────────────────────────────────────────────────────────
+
+export async function createRequest(input: {
   clientName: string;
   clientEmail: string | null;
-  platforms: Platform[];
-}): RecommendationRequest {
+  context: string | null;
+  destinations: DestinationId[];
+}): Promise<RecommendationRequest> {
+  const db = await getDb();
   for (let attempt = 0; attempt < 5; attempt++) {
-    const slug = slugId();
+    const id = nanoid();
+    const slug = nanoid(12);
+    const created_at = now();
     try {
-      const id = nanoid();
-      const created_at = new Date().toISOString();
-      const platformsJson = JSON.stringify(input.platforms);
-      db.prepare(
-        `INSERT INTO requests (id, freelancer_id, slug, client_name, client_email, platforms, raw_text, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, NULL, ?)`
-      ).run(id, input.freelancerId, slug, input.clientName, input.clientEmail, platformsJson, created_at);
-
-      const insertVariant = db.prepare(
-        `INSERT INTO variants (id, request_id, platform, text, char_limit, status, generated_by, created_at)
-         VALUES (?, ?, ?, NULL, ?, 'pending', NULL, ?)`
+      await db.batch(
+        [
+          {
+            sql: `INSERT INTO requests (id, slug, client_name, client_email, context, destinations, created_at)
+                  VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            args: [id, slug, input.clientName, input.clientEmail, input.context, JSON.stringify(input.destinations), created_at],
+          },
+          ...input.destinations.map((destination) => ({
+            sql: `INSERT INTO variants (id, request_id, destination, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
+            args: [nanoid(), id, destination, created_at, created_at],
+          })),
+        ],
+        "write"
       );
-      for (const platform of input.platforms) {
-        insertVariant.run(nanoid(), id, platform, PLATFORMS[platform].charLimit, created_at);
-      }
-
       return {
         id,
-        freelancer_id: input.freelancerId,
         slug,
         client_name: input.clientName,
         client_email: input.clientEmail,
-        platforms: platformsJson,
+        context: input.context,
+        destinations: input.destinations,
         raw_text: null,
+        consent_public: false,
+        consent_at: null,
+        regen_count: 0,
         created_at,
+        submitted_at: null,
       };
     } catch (err) {
+      // Unique slug collision is the only expected failure. Retry with a new one.
       if (attempt === 4) throw err;
     }
   }
-  throw new Error("Failed to create request after retries");
+  throw new Error("Failed to create request");
 }
 
-export function getRequestBySlug(slug: string): RecommendationRequest | undefined {
-  return db
-    .prepare(`SELECT * FROM requests WHERE slug = ?`)
-    .get(slug) as RecommendationRequest | undefined;
+export async function getRequestBySlug(slug: string): Promise<RequestWithVariants | null> {
+  const db = await getDb();
+  const { rows } = await db.execute({ sql: `SELECT * FROM requests WHERE slug = ?`, args: [slug] });
+  if (!rows[0]) return null;
+  const request = toRequest(rows[0]);
+  return { ...request, variants: await listVariants(request.id) };
 }
 
-export function getRequestById(id: string): RecommendationRequest | undefined {
-  return db.prepare(`SELECT * FROM requests WHERE id = ?`).get(id) as
-    | RecommendationRequest
-    | undefined;
+export async function listRequests(): Promise<RequestWithVariants[]> {
+  const db = await getDb();
+  const [requests, variants] = await Promise.all([
+    db.execute(`SELECT * FROM requests ORDER BY created_at DESC`),
+    db.execute(`SELECT * FROM variants`),
+  ]);
+  const byRequest = new Map<string, Variant[]>();
+  for (const row of variants.rows) {
+    const v = toVariant(row);
+    byRequest.set(v.request_id, [...(byRequest.get(v.request_id) ?? []), v]);
+  }
+  return requests.rows.map((row) => {
+    const r = toRequest(row);
+    return { ...r, variants: sortVariants(r.destinations, byRequest.get(r.id) ?? []) };
+  });
 }
 
-export function listVariantsForRequest(requestId: string): Variant[] {
-  return db
-    .prepare(`SELECT * FROM variants WHERE request_id = ? ORDER BY platform`)
-    .all(requestId) as Variant[];
+async function listVariants(requestId: string): Promise<Variant[]> {
+  const db = await getDb();
+  const [{ rows }, req] = await Promise.all([
+    db.execute({ sql: `SELECT * FROM variants WHERE request_id = ?`, args: [requestId] }),
+    db.execute({ sql: `SELECT destinations FROM requests WHERE id = ?`, args: [requestId] }),
+  ]);
+  return sortVariants(parseDestinations(str(req.rows[0]?.destinations)), rows.map(toVariant));
 }
 
-export function saveRawText(requestId: string, rawText: string) {
-  db.prepare(`UPDATE requests SET raw_text = ? WHERE id = ?`).run(rawText, requestId);
+function sortVariants(order: DestinationId[], variants: Variant[]) {
+  return [...variants].sort((a, b) => order.indexOf(a.destination) - order.indexOf(b.destination));
 }
 
-export function saveVariantText(
-  variantId: string,
-  text: string,
-  generatedBy: "ai" | "fallback"
-) {
-  db.prepare(
-    `UPDATE variants SET text = ?, status = 'adapted', generated_by = ? WHERE id = ?`
-  ).run(text, generatedBy, variantId);
-}
-
-export function markVariantCopied(variantId: string) {
-  db.prepare(`UPDATE variants SET client_copied_at = ? WHERE id = ?`).run(
-    new Date().toISOString(),
-    variantId
+export async function deleteRequest(id: string) {
+  const db = await getDb();
+  await db.batch(
+    [
+      { sql: `DELETE FROM variants WHERE request_id = ?`, args: [id] },
+      { sql: `DELETE FROM requests WHERE id = ?`, args: [id] },
+    ],
+    "write"
   );
 }
 
-export function markVariantSubmitted(variantId: string) {
-  const variant = db.prepare(`SELECT * FROM variants WHERE id = ?`).get(variantId) as
-    | Variant
-    | undefined;
-  if (!variant) return;
-  const resurfacingDisabled = variant.platform === "upwork" ? 1 : variant.resurfacing_disabled;
-  db.prepare(
-    `UPDATE variants SET status = 'submitted', submitted_at = ?, resurfacing_disabled = ? WHERE id = ?`
-  ).run(new Date().toISOString(), resurfacingDisabled, variantId);
+/** Saves the client's original text, consent and every generated version. */
+export async function saveSubmission(input: {
+  requestId: string;
+  rawText: string;
+  consentPublic: boolean;
+  texts: { destination: DestinationId; text: string; generatedBy: GeneratedBy }[];
+  countsAsRegeneration: boolean;
+}) {
+  const db = await getDb();
+  const at = now();
+  await db.batch(
+    [
+      {
+        sql: `UPDATE requests SET raw_text = ?, consent_public = ?, consent_at = ?, consent_version = ?,
+                submitted_at = COALESCE(submitted_at, ?), regen_count = regen_count + ? WHERE id = ?`,
+        args: [
+          input.rawText,
+          input.consentPublic ? 1 : 0,
+          input.consentPublic ? at : null,
+          input.consentPublic ? CONSENT_VERSION : null,
+          at,
+          input.countsAsRegeneration ? 1 : 0,
+          input.requestId,
+        ],
+      },
+      ...input.texts.map((t) => ({
+        sql: `UPDATE variants SET text = ?, generated_text = ?, generated_by = ?, edited = 0, updated_at = ?
+              WHERE request_id = ? AND destination = ?`,
+        args: [t.text, t.text, t.generatedBy, at, input.requestId, t.destination],
+      })),
+    ],
+    "write"
+  );
 }
 
-export function listRequestsForFreelancer(
-  freelancerId: string
-): (RecommendationRequest & { variants: Variant[] })[] {
-  const requests = db
-    .prepare(`SELECT * FROM requests WHERE freelancer_id = ? ORDER BY created_at DESC`)
-    .all(freelancerId) as RecommendationRequest[];
-  return requests.map((request) => ({
-    ...request,
-    variants: listVariantsForRequest(request.id),
-  }));
+export async function saveRegeneratedVariant(input: {
+  requestId: string;
+  destination: DestinationId;
+  text: string;
+  generatedBy: GeneratedBy;
+}) {
+  const db = await getDb();
+  const at = now();
+  await db.batch(
+    [
+      {
+        sql: `UPDATE variants SET text = ?, generated_text = ?, generated_by = ?, edited = 0, updated_at = ?
+              WHERE request_id = ? AND destination = ?`,
+        args: [input.text, input.text, input.generatedBy, at, input.requestId, input.destination],
+      },
+      { sql: `UPDATE requests SET regen_count = regen_count + 1 WHERE id = ?`, args: [input.requestId] },
+    ],
+    "write"
+  );
+}
+
+export async function saveVariantEdit(requestId: string, destination: DestinationId, text: string) {
+  const db = await getDb();
+  await db.execute({
+    sql: `UPDATE variants SET text = ?, edited = CASE WHEN ? = generated_text THEN 0 ELSE 1 END, updated_at = ?
+          WHERE request_id = ? AND destination = ?`,
+    args: [text, text, now(), requestId, destination],
+  });
+}
+
+export async function markCopied(requestId: string, destination: DestinationId) {
+  const db = await getDb();
+  await db.execute({
+    sql: `UPDATE variants SET copied_at = COALESCE(copied_at, ?) WHERE request_id = ? AND destination = ?`,
+    args: [now(), requestId, destination],
+  });
+}
+
+export async function setRequestSent(requestId: string, destination: DestinationId, sent: boolean) {
+  const db = await getDb();
+  await db.execute({
+    sql: `UPDATE variants SET request_sent_at = ? WHERE request_id = ? AND destination = ?`,
+    args: [sent ? now() : null, requestId, destination],
+  });
+}
+
+export async function setLive(requestId: string, destination: DestinationId, live: boolean, url: string | null) {
+  const db = await getDb();
+  await db.execute({
+    sql: `UPDATE variants SET live_at = ?, live_url = ? WHERE request_id = ? AND destination = ?`,
+    args: [live ? now() : null, live ? url : null, requestId, destination],
+  });
+}
+
+export async function setConsent(requestId: string, consentPublic: boolean) {
+  const db = await getDb();
+  await db.execute({
+    sql: `UPDATE requests SET consent_public = ?, consent_at = ?, consent_version = ? WHERE id = ?`,
+    args: [consentPublic ? 1 : 0, consentPublic ? now() : null, consentPublic ? CONSENT_VERSION : null, requestId],
+  });
 }

@@ -1,84 +1,46 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createFreelancer, getFreelancerBySlug, createRequest } from "@/lib/db/repository";
-import type { Platform } from "@/lib/adaptation/platforms";
-
-const FREELANCER_COOKIE = "relay_freelancer_slug";
+import { requireOwner } from "@/lib/auth";
+import { createRequest } from "@/lib/db/repository";
+import { isDestinationId, type DestinationId } from "@/lib/destinations/registry";
 
 const formSchema = z.object({
-  freelancerName: z.string().trim().min(1).max(120).optional(),
   clientName: z.string().trim().min(1, "Client name is required.").max(120),
-  clientEmail: z.string().trim().email().optional().or(z.literal("")),
-  platforms: z
-    .array(z.enum(["linkedin", "upwork", "contra"]))
-    .min(1, "Pick at least one platform."),
+  clientEmail: z.union([z.literal(""), z.string().trim().email("That email doesn't look right.")]),
+  context: z.string().trim().max(500, "Keep the context under 500 characters."),
 });
 
 export type CreateRequestState = {
   error: string | null;
-  // Echoed back on failure so the form can repopulate instead of the
-  // client re-typing everything — a failed submit re-renders this page
-  // from the server, which resets any uncontrolled input to its default.
-  values?: {
-    freelancerName: string;
-    clientName: string;
-    clientEmail: string;
-    platforms: Platform[];
-  };
+  // Echoed back so a failed submit doesn't wipe the form.
+  values?: { clientName: string; clientEmail: string; context: string; destinations: DestinationId[] };
 };
 
 export async function createRequestAction(
-  _prevState: CreateRequestState,
+  _prev: CreateRequestState,
   formData: FormData
 ): Promise<CreateRequestState> {
-  const cookieStore = await cookies();
-  const existingSlug = cookieStore.get(FREELANCER_COOKIE)?.value;
+  await requireOwner("/new");
 
-  const freelancerNameRaw = formData.get("freelancerName")?.toString() ?? "";
-  const clientNameRaw = formData.get("clientName")?.toString() ?? "";
-  const clientEmailRaw = formData.get("clientEmail")?.toString() ?? "";
-  const platforms = formData.getAll("platforms") as Platform[];
   const values = {
-    freelancerName: freelancerNameRaw,
-    clientName: clientNameRaw,
-    clientEmail: clientEmailRaw,
-    platforms,
+    clientName: formData.get("clientName")?.toString() ?? "",
+    clientEmail: formData.get("clientEmail")?.toString() ?? "",
+    context: formData.get("context")?.toString() ?? "",
+    destinations: formData.getAll("destinations").map(String).filter(isDestinationId),
   };
 
-  const parsed = formSchema.safeParse({
-    freelancerName: freelancerNameRaw || undefined,
-    clientName: clientNameRaw,
-    clientEmail: clientEmailRaw,
-    platforms,
-  });
+  const parsed = formSchema.safeParse(values);
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check the form.", values };
+  if (values.destinations.length === 0) return { error: "Pick at least one destination.", values };
 
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Please check the form.", values };
-  }
-
-  let freelancer = existingSlug ? getFreelancerBySlug(existingSlug) : undefined;
-
-  if (!freelancer) {
-    if (!parsed.data.freelancerName) {
-      return { error: "Your name is required.", values };
-    }
-    freelancer = createFreelancer(parsed.data.freelancerName);
-    cookieStore.set(FREELANCER_COOKIE, freelancer.slug, {
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 365,
-    });
-  }
-
-  const request = createRequest({
-    freelancerId: freelancer.id,
+  const request = await createRequest({
     clientName: parsed.data.clientName,
     clientEmail: parsed.data.clientEmail || null,
-    platforms: parsed.data.platforms as Platform[],
+    context: parsed.data.context || null,
+    destinations: values.destinations,
   });
 
-  redirect(`/dashboard/${freelancer.slug}?created=${request.slug}`);
+  redirect(`/requests/${request.slug}?created=1`);
 }

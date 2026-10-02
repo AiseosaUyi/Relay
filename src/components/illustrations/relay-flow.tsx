@@ -1,17 +1,17 @@
-import { PLATFORM_LIST } from "@/lib/adaptation/platforms";
+import type { DestinationId } from "@/lib/destinations/registry";
 import { PlatformIcon } from "@/components/icons/platform-icon";
 
 /**
  * Custom illustration, not a stock icon: one source node (the client's
- * single recommendation) branching into the three real platform nodes,
+ * single recommendation) branching into the a few real destination nodes,
  * reusing the same PlatformIcon marks used throughout the product so it
  * reads as this product's own visual language, not generic clip art.
  */
 export function RelayFlowIllustration({ className }: { className?: string }) {
-  const targets = [
-    { y: 34, id: PLATFORM_LIST[0].id },
-    { y: 100, id: PLATFORM_LIST[1].id },
-    { y: 166, id: PLATFORM_LIST[2].id },
+  const targets: { y: number; id: DestinationId }[] = [
+    { y: 34, id: "linkedin" },
+    { y: 100, id: "contra" },
+    { y: 166, id: "site_quote" },
   ];
 
   return (
@@ -20,7 +20,7 @@ export function RelayFlowIllustration({ className }: { className?: string }) {
       fill="none"
       className={className}
       role="img"
-      aria-label="One recommendation branching into LinkedIn, Upwork, and Contra"
+      aria-label="One recommendation branching into LinkedIn, Contra and a website testimonial"
     >
       {targets.map((t) => (
         <path

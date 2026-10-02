@@ -6,82 +6,63 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Recommendation Relay ("Relay"): a client writes one recommendation for a freelancer, and the
-app adapts it (length + tone) for LinkedIn, Upwork, and Contra — the only three
-freelance/design platforms with a client-recommendation feature. No platform lets a third
-party post on someone's behalf, so this is a drafting + tracking assistant, not an
-auto-poster: the client still submits it themselves on each platform; this tool just gives
-them a pre-written, correctly-sized version to paste in when that platform's native request
-arrives.
+Relay: a personal, single-owner tool. A client writes one recommendation for the owner and
+Relay gets it ready for every destination it belongs on (profile platforms, client posts,
+review sites, the owner's own site and proposals). No platform lets a third party post on
+someone's behalf, so this drafts, tracks and reminds. It never posts or sends anything.
+Upwork is intentionally gone (it stopped accepting testimonial requests in 2026). Research and
+sources per destination are in `BUILD_PLAN.md`.
 
 ## Commands
 
 ```bash
-npm run dev      # start dev server (localhost:3000, falls back to next free port)
+npm run dev      # start dev server (localhost:3000)
 npm run build    # production build
-npm run lint     # eslint (flat config: eslint-config-next core-web-vitals + typescript)
-npx tsc --noEmit # typecheck (no separate script defined)
+npm run lint     # eslint
+npx tsc --noEmit # typecheck (run `npx next typegen` first on a fresh clone for PageProps)
 ```
 
-No test suite is configured in this repo.
-
-To enable real AI-adapted variants (tone-aware, not just length-trimmed), set
-`AI_GATEWAY_API_KEY` before starting the dev server (get a key from the Vercel AI Gateway).
-Without it, the app runs fully on a deterministic fallback adapter — this is the default state
-for a fresh clone, and it's a normal, demoable mode, not a broken one.
-
-Local data persists in a git-ignored SQLite file at `data/relay.db`. Delete `data/` to reset
-to a clean state.
+No test suite is configured. Local data is a git-ignored libSQL file at `data/relay-v2.db`.
 
 ## Architecture
 
-**Core data flow:** `freelancer` (1) → `requests` (many, one per client) → `variants` (many,
-one row per platform per request). A request is created with a fixed set of platforms; each
-gets its own variant row (`pending` until the client submits text, then `adapted`). See
-`src/lib/db/client.ts` for the schema.
+**Destinations** (`src/lib/destinations/registry.ts`) are the single source of truth: label,
+group, max and target length, tone for the AI, the owner link it needs, client steps, owner
+steps, and a `verified` flag for anything not confirmed from a primary source. Four groups:
+- `profile` and `post`: AI adapted, the client edits and approves.
+- `review`: the client's own words only. Review sites (Google, Trustpilot, Clutch) forbid
+  pre-written or AI reviews, so never route these through the model.
+- `owned`: assets for the owner. Generated with everything else but only shown to the owner
+  when the client consented (`requests.consent_public`). Never shown on the client page.
 
-**Routes and what happens in each:**
-- `/` — marketing/landing page.
-- `/new` — freelancer onboarding (first visit, captures a name) or adds a new client request to
-  an existing freelancer. On submit, sets an httpOnly cookie and redirects to the dashboard.
-- `/dashboard/[slug]` — freelancer's request list, reached via the cookie or the URL slug
-  directly (no login).
-- `/r/[slug]` — the link sent to the client. They write one recommendation; submitting it
-  triggers adaptation and shows per-platform tabs with copy-ready text and instructions for
-  when to paste it in.
+**Data** goes through `src/lib/db/repository.ts` only. `src/lib/db/client.ts` owns the libSQL
+connection (local file or Turso via `DATABASE_URL`) and creates tables on first use. Tables:
+`settings` (single row), `requests`, `variants` (one per request and destination).
 
-**Identity has no auth layer.** A freelancer is identified purely by an httpOnly cookie
-(`relay_freelancer_slug`) mapping to their `freelancer.slug`. There's no login, no email
-verification, and no account-recovery path — clearing cookies loses dashboard access
-permanently. This is a known, deliberate gap (not an oversight to silently "fix"); changing it
-is a product decision, not a UI fix.
+**Auth** (`src/lib/auth.ts`): one owner password (`OWNER_PASSWORD`), an HMAC cookie, and
+`requireOwner()` at the top of every owner page and server action. No password in local dev
+means open; no password in production means locked. The client page `/r/[slug]` is public.
 
-**Adaptation core loop** (`src/lib/adaptation/adapt.ts`): `adaptRecommendation()` branches on
-whether `AI_GATEWAY_API_KEY` is set. AI path uses the Vercel AI Gateway
-(`anthropic/claude-haiku-4.5` via the `ai` SDK) with a per-platform Zod schema built from
-`src/lib/adaptation/platforms.ts`. The fallback path is a deterministic sentence-boundary
-truncation to each platform's char limit — no tone rewriting. Both paths return the identical
-`AdaptedVariant[]` shape, and every variant carries `generatedBy: "ai" | "fallback"` so the UI
-can honestly label which mode produced it (never claim AI when it wasn't used).
+**Routes:** `/dashboard`, `/new`, `/settings`, `/requests/[slug]` (owner), `/login`,
+`/r/[slug]` (client). `/` redirects to the dashboard.
 
-**`src/lib/adaptation/platforms.ts` is the single source of truth** for platform metadata
-(label, char limit, tone description, per-platform instruction copy) — it drives both the AI
-prompt construction and every platform-facing UI element. Contra's char limit is an
-unverified/best-guess value (flagged in-file); don't treat it as confirmed.
+**Adaptation** (`src/lib/adaptation/adapt.ts`): one structured-output call for all adapted
+destinations of a request. Length targets live in `.describe()`, not zod `.max()`, and are
+enforced by trimming after generation (a `.max()` failure used to throw away the whole object).
+Any AI failure falls back per destination to the client's own words trimmed to fit, labelled
+`fallback`. AI is on when `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN` is set.
 
-**Data layer boundary:** every DB call goes through `src/lib/db/repository.ts`.
-`src/lib/db/client.ts` is the only file that owns the actual connection (SQLite via
-`better-sqlite3`, dev-only) — it's the documented swap point for Supabase in production. Don't
-call `better-sqlite3` directly from route/component code; add a repository function instead.
+**Cost guard:** public actions cap AI calls per link at one adaptation plus
+`MAX_REGENERATIONS` (3). Edits, copies and consent changes never call the model. Also set a
+budget in the AI Gateway dashboard.
 
 **Icon system** (`src/components/icons/platform-icon.tsx`): one lookup (`PlatformIcon`) used
-everywhere a platform needs a visual mark, so brand icons aren't hand-duplicated per call site.
+everywhere a destination needs a visual mark, so brand icons aren't hand-duplicated per call site.
 Icons render in `currentColor` (state-driven via the parent's text-color class — muted at rest,
 primary/foreground when selected/active), never a hardcoded brand hex. Marks come from
 `react-icons`/`simple-icons` only where verified accurate; a platform without a confirmed
-source mark (currently Contra) degrades to a quiet wordmark badge rather than a guessed logo —
-extend the registry with a real `{ kind: "mark", Icon }` entry the moment one is verified,
-don't hand-draw a brand logo from memory.
+source mark (Contra, Clutch and others) degrades to its monogram badge rather than a guessed
+logo. Add to `MARKS` the moment one is verified, don't hand-draw a brand logo from memory.
 
 **Never call `navigator.clipboard.writeText` directly.** Use `copyToClipboard()` from
 `src/lib/utils.ts` for any copy-to-clipboard button. The raw Clipboard API can hang
