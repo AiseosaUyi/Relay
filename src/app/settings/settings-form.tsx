@@ -15,10 +15,10 @@ export function SettingsForm({
 }) {
   const [state, action, pending] = useActionState<SettingsState, FormData>(saveSettingsAction, { error: null });
   return (
-    <form action={action} className="space-y-8">
+    <form action={action} className="space-y-10">
       {welcome && <input type="hidden" name="welcome" value="1" />}
       {children}
-      <div className="sticky bottom-0 -mx-6 flex items-center gap-3 border-t border-border bg-background/90 px-6 py-4 backdrop-blur-sm">
+      <div className="sticky bottom-0 -mx-6 flex items-center gap-4 border-t border-border/70 bg-background/85 px-6 py-4 backdrop-blur-md">
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? "Saving…" : welcome ? "Save and create a request" : "Save settings"}
         </Button>

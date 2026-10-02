@@ -28,7 +28,7 @@ export default async function RecommendationPage(props: PageProps<"/r/[slug]">) 
     }));
 
   return (
-    <main className="relative flex min-h-svh w-full flex-col items-center overflow-hidden px-6 py-16 sm:py-24">
+    <main className="relative flex min-h-svh w-full flex-col items-center overflow-hidden px-6 py-14 sm:py-20">
       <div className="relative w-full max-w-xl">
         <RecommendationForm
           slug={slug}

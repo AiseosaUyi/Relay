@@ -1,4 +1,5 @@
 import { OwnerHeader } from "@/components/owner-header";
+import { PageHeader } from "@/components/page-header";
 import { DestinationPicker } from "@/components/destination-picker";
 import { requireOwner } from "@/lib/auth";
 import { getSettings } from "@/lib/db/repository";
@@ -14,20 +15,21 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
   return (
     <main className="min-h-svh w-full">
       <OwnerHeader />
-      <div className="mx-auto w-full max-w-3xl px-6 py-8">
-        <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
-          {welcome ? "Set up Relay" : "Settings"}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {welcome
-            ? "Add your name and the profile links clients need. You only do this once."
-            : "Your name, profile links and the destinations new requests start with."}
-        </p>
+      <div className="page-enter mx-auto w-full max-w-3xl px-6 py-12">
+        <PageHeader
+          back={welcome ? undefined : { href: "/dashboard", label: "Recommendations" }}
+          title={welcome ? "Set up Relay" : "Settings"}
+          description={
+            welcome
+              ? "Add your name and the profile links clients need. You only do this once."
+              : "Your name, profile links and the destinations new requests start with."
+          }
+        />
 
-        <div className="mt-8">
+        <div className="mt-10">
           <SettingsForm welcome={welcome}>
-            <section className="space-y-4">
-              <h2 className="font-heading text-lg font-semibold tracking-tight">You</h2>
+            <section className="space-y-5 border-t border-border pt-8 first:border-t-0 first:pt-0">
+              <h2 className="font-heading text-lg font-semibold tracking-[-0.025em]">You</h2>
               <TextField name="ownerName" label="Your name, as clients know you" defaultValue={settings?.owner_name} placeholder="Aise Idahor" required />
               <TextField
                 name="ownerRole"
@@ -38,9 +40,9 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
               />
             </section>
 
-            <section className="space-y-4">
+            <section className="space-y-5 border-t border-border pt-8">
               <div>
-                <h2 className="font-heading text-lg font-semibold tracking-tight">Profile and review links</h2>
+                <h2 className="font-heading text-lg font-semibold tracking-[-0.025em]">Profile and review links</h2>
                 <p className="text-sm text-muted-foreground">Fill in only the ones you use. Clients see these in their instructions.</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -57,9 +59,9 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
               </div>
             </section>
 
-            <section className="space-y-4">
+            <section className="space-y-5 border-t border-border pt-8">
               <div>
-                <h2 className="font-heading text-lg font-semibold tracking-tight">Default destinations</h2>
+                <h2 className="font-heading text-lg font-semibold tracking-[-0.025em]">Default destinations</h2>
                 <p className="text-sm text-muted-foreground">Pre-selected on every new request. You can change them per client.</p>
               </div>
               <DestinationPicker selected={settings?.default_destinations ?? DEFAULT_DESTINATIONS} />

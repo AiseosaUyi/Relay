@@ -123,15 +123,15 @@ function WriteView({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="page-enter space-y-8">
       <div className="flex flex-col items-center text-center">
-        <span className="flex size-11 items-center justify-center rounded-full bg-foreground text-lg font-semibold text-background">
+        <span className="flex size-12 items-center justify-center rounded-full bg-foreground text-lg font-semibold text-background">
           {ownerName.charAt(0).toUpperCase()}
         </span>
-        <h1 className="mt-4 font-heading text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
+        <h1 className="mt-6 font-heading text-[2rem] leading-[1.08] font-semibold tracking-[-0.04em] text-balance text-foreground sm:text-[2.5rem]">
           {existing ? "Edit what you wrote" : `Hi ${first}, write a recommendation for ${ownerName}`}
         </h1>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">
+        <p className="mt-3 max-w-md text-[0.9375rem] leading-relaxed text-muted-foreground">
           {existing
             ? "Saving rewrites every version from your new text."
             : "About two minutes. Write it like you'd tell a friend. You write it once, and you get a version ready for each place below."}
@@ -139,7 +139,7 @@ function WriteView({
       </div>
 
       {context && !existing && (
-        <div className="flex items-start gap-2.5 rounded-xl bg-wash px-3.5 py-3 text-sm text-muted-foreground">
+        <div className="flex items-start gap-3 rounded-xl border border-border bg-card px-4 py-3.5 text-sm leading-relaxed text-muted-foreground">
           <Info className="mt-0.5 size-4 shrink-0 text-signal" />
           <span>
             <span className="font-medium text-foreground">What you worked on together.</span> {context}
@@ -147,26 +147,26 @@ function WriteView({
         </div>
       )}
 
-      <div className="rounded-2xl bg-card p-1 ring-1 ring-foreground/10 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]">
+      <div className="rounded-xl border border-input bg-card shadow-[0_1px_0_rgba(15,15,16,0.04)] transition-[border-color,box-shadow] duration-150 focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/20">
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           aria-label="Your recommendation"
           placeholder={`What did ${ownerName} help you with? What was it like working together, and what changed because of it?`}
-          className="min-h-48 rounded-[calc(var(--radius-2xl)-4px)] border-0 bg-transparent px-3.5 py-3 text-base focus-visible:ring-0"
+          className="min-h-60 rounded-xl border-0 bg-transparent px-5 pt-5 pb-3 text-[1.0625rem] leading-8 hover:border-0 focus-visible:ring-0 md:text-[1.0625rem]"
           disabled={pending}
         />
-        <div className="flex justify-end px-3 pb-2 text-xs text-muted-foreground">
+        <div className="flex justify-end px-5 pb-3 text-xs text-muted-foreground tabular-nums">
           {text.trim().length < MIN_CHARS ? `${MIN_CHARS - text.trim().length} more characters to go` : `${text.trim().length} characters`}
         </div>
       </div>
 
-      <label className="flex cursor-pointer items-start gap-2.5 text-sm text-muted-foreground">
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-card px-4 py-3.5 text-sm leading-relaxed text-muted-foreground transition-colors hover:border-foreground/25">
         <input
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsentLocal(e.target.checked)}
-          className="mt-0.5 size-4 accent-[var(--color-signal)]"
+          className="mt-0.5 size-[18px] shrink-0 accent-[var(--color-signal)]"
         />
         <span>
           {ownerName} can quote this, with my name, on their website and in proposals. <span className="text-muted-foreground/70">Optional.</span>
@@ -174,11 +174,11 @@ function WriteView({
       </label>
 
       {destinations.length > 0 && !existing && (
-        <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span>You&apos;ll get versions for</span>
           {destinations.map((d) => (
-            <span key={d.id} className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5">
-              <PlatformIcon id={d.id} className="size-3" />
+            <span key={d.id} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-foreground">
+              <PlatformIcon id={d.id} className="size-3.5" />
               {d.label}
             </span>
           ))}
@@ -195,7 +195,6 @@ function WriteView({
           onClick={handleSubmit}
           disabled={pending || rewriteBlocked || text.trim().length < MIN_CHARS}
           size="lg"
-          className="h-11 text-base"
         >
           {pending ? (
             <>
@@ -214,7 +213,7 @@ function WriteView({
           </Button>
         )}
       </div>
-      <p className="text-xs text-muted-foreground/80">Nothing gets posted for you. You paste each version yourself, on each platform.</p>
+      <p className="text-sm text-muted-foreground">Nothing gets posted for you. You paste each version yourself, on each platform.</p>
     </div>
   );
 }
@@ -247,13 +246,13 @@ function ResultsView({
   }
 
   return (
-    <div className="animate-in space-y-8 fade-in-0 duration-300">
+    <div className="page-enter space-y-12">
       <div className="flex flex-col items-center text-center">
-        <span className="flex size-11 animate-in items-center justify-center rounded-full bg-signal/10 text-signal zoom-in-50 duration-300">
-          <Check className="size-5" strokeWidth={2.5} />
+        <span className="flex size-12 animate-in items-center justify-center rounded-full bg-foreground text-signal zoom-in-50 duration-300">
+          <Check className="size-5" strokeWidth={2.75} />
         </span>
-        <h1 className="mt-4 font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Thank you. You&apos;re all set.</h1>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">
+        <h1 className="mt-6 font-heading text-[2rem] leading-[1.08] font-semibold tracking-[-0.04em] text-foreground sm:text-[2.5rem]">Thank you. You&apos;re all set.</h1>
+        <p className="mt-3 max-w-md text-[0.9375rem] leading-relaxed text-muted-foreground">
           Everything is saved on this link, so you can come back any time. Paste each version when that platform&apos;s request reaches you.
         </p>
       </div>
@@ -262,10 +261,10 @@ function ResultsView({
         const items = destinations.filter((d) => d.group === group);
         if (items.length === 0) return null;
         return (
-          <section key={group} className="space-y-3">
+          <section key={group} className="space-y-4">
             <div>
-              <h2 className="font-heading text-lg font-semibold tracking-tight text-foreground">{title}</h2>
-              <p className="text-sm text-muted-foreground">{blurb}</p>
+              <h2 className="font-heading text-lg font-semibold tracking-[-0.025em] text-foreground">{title}</h2>
+              <p className="mt-1 text-[0.9375rem] text-muted-foreground">{blurb}</p>
             </div>
             {items.map((d) => {
               const v = byId.get(d.id);
@@ -287,14 +286,14 @@ function ResultsView({
         );
       })}
 
-      <div className="space-y-3 border-t border-border pt-6 text-sm">
-        <label className="flex cursor-pointer items-start gap-2.5 text-muted-foreground">
+      <div className="space-y-4 border-t border-border pt-8 text-sm">
+        <label className="flex cursor-pointer items-start gap-3 leading-relaxed text-muted-foreground">
           <input
             type="checkbox"
             checked={state.consentPublic}
             disabled={consentSaving}
             onChange={(e) => toggleConsent(e.target.checked)}
-            className="mt-0.5 size-4 accent-[var(--color-signal)]"
+            className="mt-0.5 size-[18px] shrink-0 accent-[var(--color-signal)]"
           />
           <span>{ownerName} can quote this, with my name, on their website and in proposals.</span>
         </label>
@@ -308,14 +307,16 @@ function ResultsView({
 
 function CardShell({ destination: d, children }: { destination: ClientDestination; children: React.ReactNode }) {
   return (
-    <div className="space-y-3 rounded-2xl bg-card p-4 ring-1 ring-foreground/10 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]">
-      <div className="flex items-center gap-2">
-        <PlatformIcon id={d.id} className="size-4 text-foreground" />
+    <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[0_1px_0_rgba(15,15,16,0.04)]">
+      <div className="flex items-center gap-3">
+        <span className="flex size-9 items-center justify-center rounded-lg bg-muted">
+          <PlatformIcon id={d.id} className="size-[18px] text-foreground" />
+        </span>
         <h3 className="font-medium text-foreground">{d.label}</h3>
       </div>
       {children}
       {d.steps.length > 0 && (
-        <ol className="list-decimal space-y-1 rounded-xl bg-wash py-3 pr-3.5 pl-8 text-sm text-muted-foreground">
+        <ol className="list-decimal space-y-1.5 border-l-2 border-border py-0.5 pl-8 text-sm leading-relaxed text-muted-foreground marker:text-muted-foreground/60">
           {d.steps.map((s) => (
             <li key={s}>
               <Linkified text={s} />
@@ -323,7 +324,7 @@ function CardShell({ destination: d, children }: { destination: ClientDestinatio
           ))}
         </ol>
       )}
-      {d.note && <p className="text-xs text-muted-foreground/80">{d.note}</p>}
+      {d.note && <p className="text-xs leading-relaxed text-muted-foreground">{d.note}</p>}
     </div>
   );
 }
@@ -387,7 +388,7 @@ function AdaptedCard({
         onBlur={persist}
         aria-label={`${d.label} version`}
         disabled={pending}
-        className="min-h-32 text-base"
+        className="min-h-36 leading-7"
       />
       <div className="flex flex-wrap items-center gap-2">
         <CopyButton
@@ -424,7 +425,7 @@ function AdaptedCard({
 function ReviewCard({ slug, destination: d, rawText }: { slug: string; destination: ClientDestination; rawText: string }) {
   return (
     <CardShell destination={d}>
-      <p className="rounded-xl bg-wash px-3.5 py-3 text-sm whitespace-pre-wrap text-foreground">{rawText}</p>
+      <p className="border-l-2 border-signal pl-4 text-[0.9375rem] leading-7 whitespace-pre-wrap text-foreground">{rawText}</p>
       <CopyButton text={rawText} label="Copy my words" onCopied={() => void recordCopy(slug, d.id)} />
     </CardShell>
   );

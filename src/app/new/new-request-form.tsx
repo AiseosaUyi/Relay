@@ -13,7 +13,7 @@ export function NewRequestForm({ defaults }: { defaults: DestinationId[] }) {
   const [state, formAction, pending] = useActionState<CreateRequestState, FormData>(createRequestAction, { error: null });
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="space-y-8">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1.5">
           <span className="text-sm font-medium text-foreground">Client name</span>
